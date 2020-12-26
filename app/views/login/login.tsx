@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import {ip} from "../../config/credenciales"
 import { StyleSheet,
   Text,
   View,
@@ -12,6 +12,7 @@ import { StyleSheet,
 } from 'react-native';
 import axios from 'axios';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 
 export interface LoginProps {
 }
@@ -22,15 +23,17 @@ export default function Login (this: any, props: LoginProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("PRUEBA DE ERROR");
   const [mostrarError, setMostrarError] = useState(false);
+  const navegacion = useNavigation();
 
   const onFinish = () => {
-    var urlNick= 'http://localhost:8080/usuario/'+nombre;
-    if(nombre===""){
+    var urlNick= 'http://'+ip+':8080/usuario/'+nombre;
+    if(nombre==""){
       setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
       setMostrarError(true);
     }else{
       axios.get(urlNick)
       .then((response) => {
+          console.log(response.data)
           return response.data[0];
       }).then((usuarios) => {
         if(usuarios==null){
@@ -42,6 +45,7 @@ export default function Login (this: any, props: LoginProps) {
           console.log(usuarios["contrasena"])
           if(password===usuarios["contrasena"]){
             console.log("HAY QUE LOGUEAR AL USUARIO")
+            navegacion.navigate("map",{});
             // updateUsuario(usuarios["id"])
             // console.log("USUARIO LOG: "+usuarioLogueado)
           }else{
@@ -49,15 +53,16 @@ export default function Login (this: any, props: LoginProps) {
             setMostrarError(true);
           }
         }
-          console.log('USUARIOS:', usuarios);
+          //console.log('USUARIOS:', usuarios);
       })
     }
   };
 
 
   const Registrarse = () => {
-    var urlNick = 'http://localhost:8080/usuario/'+nombre;
-    if(nombre===""){
+    var urlNick = 'http://'+ip+':8080/usuario/'+nombre;
+
+    if(nombre==""){
       setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
       setMostrarError(true);
     }else{
