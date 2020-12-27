@@ -1,13 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Navegacion } from './app/navegacion';
+import { Navegation } from './app/navegation';
 import Login from './app/views/login/login';
 
 
 export default function App() {
   return (
-      <Navegacion></Navegacion>
+      <Navegation></Navegation>
   );
 }
 

@@ -1,67 +1,50 @@
 import React, { useState } from 'react';
 import {ip} from "../../config/credenciales"
 import { StyleSheet,
-  Text,
-  View,
-  Linking,
-  TouchableOpacity,
-  ToastAndroid,
-  Dimensions,
-  TextInput,
-  Button
-} from 'react-native';
-import axios from 'axios';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-
-export interface LoginProps {
+    Text,
+    View,
+    Linking,
+    TouchableOpacity,
+    ToastAndroid,
+    Dimensions,
+    TextInput,
+    Button
+  } from 'react-native';
+  import axios from 'axios';
+  import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+  import { NavigationContainer, useNavigation } from '@react-navigation/native';
+export interface RegisterProps {
 }
 
-export default function Login (this: any, props: LoginProps) {
-  
+export default function Register (props: RegisterProps) {
+
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("PRUEBA DE ERROR");
   const [mostrarError, setMostrarError] = useState(false);
   const navegacion = useNavigation();
 
-  const onFinish = () => {
-    var urlNick= 'http://'+ip+':8080/usuario/'+nombre;
+  const Registrarse = () => {
     if(nombre==""){
       setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
       setMostrarError(true);
     }else{
-      axios.get(urlNick)
-      .then((response) => {
-          console.log(response.data)
-          return response.data[0];
-      }).then((usuarios) => {
-        if(usuarios==null){
-          setError("El usuario introducido no existe");
-          setMostrarError(true);
-        }else{
-          setError("");
-          setMostrarError(false);
-          console.log(usuarios["contrasena"])
-          if(password===usuarios["contrasena"]){
-            console.log("HAY QUE LOGUEAR AL USUARIO")
-            navegacion.navigate("map",{});
-            // updateUsuario(usuarios["id"])
-            // console.log("USUARIO LOG: "+usuarioLogueado)
-          }else{
-            setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
-            setMostrarError(true);
-          }
+        axios({
+            method: 'post',
+            url: 'http://'+ip+':8080/usuario/newUsuario', 
+            data: {
+              nombre : nombre,
+              contrasena: password,
+              avatar : "avatares/avatarPorDefecto.jpg",
+              "admin" : false
+            }
+          }).then(() => {
+            navegacion.navigate("login",{});
+          });
         }
           //console.log('USUARIOS:', usuarios);
-      })
-    }
-  };
+    };
 
-
-  const Registrarse = () => {
-    navegacion.navigate("register",{});
-  };
 
   const onFinishFailed = (errorInfo: any) => {
       console.log('Failed:', errorInfo);
@@ -73,7 +56,7 @@ export default function Login (this: any, props: LoginProps) {
       <View style={styles.container}>
         <View style={styles.login}>
           <View style={styles.header}>
-            <Text style={styles.h1}>RutasApp</Text>
+            <Text style={styles.h1}>Register</Text>
             <Text>{"\n"}</Text>
           </View>
           <View style={styles.form}>
@@ -103,9 +86,6 @@ export default function Login (this: any, props: LoginProps) {
             </View>
           </View>
           <View style={styles.buttons}>
-            <Button color="black" title="Iniciar Sesion" onPress={() => onFinish()}>
-            </Button>
-            <Text>{"\n"}</Text>
             <Button
               color="black"
               title="Registrarse"
@@ -114,12 +94,6 @@ export default function Login (this: any, props: LoginProps) {
               }}
             >
             </Button>
-          </View>
-          <View style={styles.footerline}>
-            <View>
-              <Text>Registrate</Text>
-            </View>
-            
           </View>
         </View>
         <View style={styles.footer}>
@@ -197,3 +171,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
