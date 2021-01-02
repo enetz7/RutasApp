@@ -1,0 +1,212 @@
+import React, { useEffect, useState } from "react";
+import { ip } from "../../config/credenciales";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Linking,
+  TouchableOpacity,
+  ToastAndroid,
+  Dimensions,
+  TextInput,
+  Button,
+} from "react-native";
+
+import axios from "axios";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import DropDownPicker from "react-native-dropdown-picker";
+import Slider from "@react-native-community/slider";
+import { render } from "react-dom";
+import { Ruta } from "../interface/rutas";
+export interface FilterProps {}
+
+export default function Filter(props: FilterProps) {
+  const [valueCiudades, setValueCiudades] = useState(null);
+  const [valueVehiculo, setValueVehiculo] = useState(null);
+  const [sliderValue, setSliderValue] = useState(0);
+  const [itemsCiudades, setItemsCiudades] = useState([]);
+  const [coordenadasCiudad, setCoordenadas] = useState();
+  const [arrayRuta, setArrayRuta] = useState<Ruta[]>([]);
+  const navegacion = useNavigation();
+  let controller;
+
+  useEffect(() => {
+    var ciudad = [] as any;
+    var urlCiudades = "http://" + ip + ":8080/ciudades/all";
+    axios
+      .get(urlCiudades)
+      .then((response) => {
+        return response.data;
+      })
+      .then((ciudades) => {
+        ciudades.map((numero: any) =>
+          ciudad.push({ label: numero["nombre"], value: numero["nombre"] })
+        );
+        setItemsCiudades(ciudad);
+      });
+  }, []);
+
+  function printList() {
+    return arrayRuta.map((item, index) => (
+      <Text key={index}>
+        Ruta:{item["nombre"]} Tiempo:{item["tiempo"]}
+        {"\n"}{" "}
+      </Text>
+    ));
+  }
+  //
+  const buscar = () => {
+    var urlCiudadVehiculo =
+      "http://" +
+      ip +
+      ":8080/rutas/" +
+      valueCiudades +
+      "&" +
+      valueVehiculo +
+      "&" +
+      sliderValue;
+    axios
+      .get(urlCiudadVehiculo)
+      .then((response) => {
+        return response.data;
+      })
+      .then((rutas) => {
+        //var ruta: Ruta[];
+        var ruta: Ruta[] = [];
+        rutas.map((numero: any) => ruta.push(numero));
+        setArrayRuta(ruta);
+      });
+  };
+
+  return (
+    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 100 }}>
+      <View style={styles.container}>
+        <View style={styles.form}>
+          <Text style={styles.text}>Ciudades</Text>
+          <DropDownPicker
+            items={itemsCiudades}
+            controller={(instance) => (controller = instance)}
+            onChangeList={(items, callback) => {
+              new Promise((resolve, reject) => resolve(setItemsCiudades(items)))
+                .then(() => callback())
+                .catch(() => {});
+            }}
+            defaultValue={valueCiudades}
+            onChangeItem={(item) => setValueCiudades(item.value)}
+          ></DropDownPicker>
+
+          <Text style={styles.text}>Vehiculo</Text>
+
+          <DropDownPicker
+            items={[
+              { label: "Andando", value: "Andando" },
+              { label: "Bicicleta", value: "Bicicleta" },
+              { label: "Coche", value: "Coche" },
+            ]}
+            controller={(instance) => (controller = instance)}
+            defaultValue={valueVehiculo}
+            onChangeItem={(item) => setValueVehiculo(item.value)}
+          ></DropDownPicker>
+
+          <Text style={styles.text}>KM</Text>
+          <Text style={styles.text}>{sliderValue}</Text>
+          <Slider
+            style={{ width: 200, height: 40, alignSelf: "center" }}
+            minimumValue={0}
+            maximumValue={50}
+            minimumTrackTintColor="#FFFFFF"
+            maximumTrackTintColor="#000000"
+            onValueChange={(value) => setSliderValue(Math.floor(value))}
+          />
+        </View>
+        <View>
+          <Text style={styles.text}>{printList()}</Text>
+        </View>
+        <View style={styles.buttons}>
+          <Button
+            color="black"
+            title="Buscar"
+            onPress={() => {
+              buscar();
+            }}
+          ></Button>
+          <Text>{"\n"}</Text>
+          <Button
+            color="black"
+            title="Mostrar mapa"
+            onPress={() => {
+              navegacion.navigate("map", {});
+            }}
+          ></Button>
+        </View>
+      </View>
+    </KeyboardAwareScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  text: {
+    textAlign: "center",
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header: {
+    flex: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  form: {
+    flex: 2,
+  },
+  textinputs: {
+    flex: 0.7,
+    justifyContent: "center",
+  },
+  buttons: {
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 0.9,
+  },
+  footerline: {
+    flex: 0.4,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+    textAlignVertical: "center",
+    alignItems: "center",
+  },
+  footer: {
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    flex: 0.15,
+  },
+  h1: {
+    fontWeight: "bold",
+    fontSize: 25,
+    alignSelf: "center",
+  },
+  h2: {
+    fontSize: 15,
+    alignSelf: "center",
+    padding: 10,
+    paddingHorizontal: 20,
+    textAlign: "center",
+  },
+  textinput: {
+    height: 50,
+
+    borderWidth: 2,
+    borderRadius: 10,
+    marginVertical: 10,
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+});

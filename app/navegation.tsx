@@ -1,23 +1,36 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import * as React from 'react';
-import { View, Text } from 'react-native';
-import Login from './views/login/login';
-import  Map  from './views/panel/map';
-import Register from './views/login/register';
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import * as React from "react";
+import { View, Text } from "react-native";
+import Login from "./views/login/login";
+import Map from "./views/panel/map";
+import Register from "./views/login/register";
+import Filter from "./views/panel/filter";
 
-export interface NavegationProps {
-}
+export interface NavegationProps {}
 
-export function Navegation (props: NavegationProps) {
-    const root = createStackNavigator();
-    return (
-     <NavigationContainer>
-         <root.Navigator initialRouteName="login">
-             <root.Screen name="login" component={Login} options={{headerShown:false}}/>
-             <root.Screen name="register" component={Register} options={{headerShown:false}}/>
-             <root.Screen name="map" component={Map} />
-         </root.Navigator>
-     </NavigationContainer>
-    );
+export function Navegation(props: NavegationProps) {
+  const root = createStackNavigator();
+  return (
+    <NavigationContainer>
+      <root.Navigator initialRouteName="login">
+        <root.Screen
+          name="login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <root.Screen
+          name="register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
+        <root.Screen name="map" component={Map} />
+        <root.Screen
+          name="filter"
+          component={Filter}
+          options={{ headerShown: false }}
+        />
+      </root.Navigator>
+    </NavigationContainer>
+  );
 }
