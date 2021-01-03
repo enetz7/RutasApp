@@ -26,13 +26,16 @@ export default function Filter(props: FilterProps) {
   const [valueVehiculo, setValueVehiculo] = useState(null);
   const [sliderValue, setSliderValue] = useState(0);
   const [itemsCiudades, setItemsCiudades] = useState([]);
-  const [coordenadasCiudad, setCoordenadas] = useState();
+  const [arrayCiudades, setArrayCiudades] = useState([]);
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
   const [arrayRuta, setArrayRuta] = useState<Ruta[]>([]);
   const navegacion = useNavigation();
   let controller;
 
   useEffect(() => {
     var ciudad = [] as any;
+    var coordenada = [] as any;
     var urlCiudades = "http://" + ip + ":8080/ciudades/all";
     axios
       .get(urlCiudades)
@@ -40,9 +43,15 @@ export default function Filter(props: FilterProps) {
         return response.data;
       })
       .then((ciudades) => {
-        ciudades.map((numero: any) =>
-          ciudad.push({ label: numero["nombre"], value: numero["nombre"] })
-        );
+        ciudades.map((numero: any) => {
+          coordenada.push({
+            ciudad: numero["nombre"],
+            latitude: numero["latitude"],
+            longitude: numero["longitude"],
+          });
+          ciudad.push({ label: numero["nombre"], value: numero["nombre"] });
+        });
+        setArrayCiudades(coordenada);
         setItemsCiudades(ciudad);
       });
   }, []);
@@ -93,7 +102,15 @@ export default function Filter(props: FilterProps) {
                 .catch(() => {});
             }}
             defaultValue={valueCiudades}
-            onChangeItem={(item) => setValueCiudades(item.value)}
+            onChangeItem={(item) => {
+              setValueCiudades(item.value);
+              arrayCiudades.map((mapa) => {
+                if (mapa["ciudad"] == item.value) {
+                  setLatitude(mapa["latitude"]);
+                  setLongitude(mapa["longitude"]);
+                }
+              });
+            }}
           ></DropDownPicker>
 
           <Text style={styles.text}>Vehiculo</Text>
@@ -136,7 +153,10 @@ export default function Filter(props: FilterProps) {
             color="black"
             title="Mostrar mapa"
             onPress={() => {
-              navegacion.navigate("map", {});
+              navegacion.navigate("map", {
+                latitude: latitude,
+                longitude: longitude,
+              });
             }}
           ></Button>
         </View>
