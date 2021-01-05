@@ -6,6 +6,7 @@ import Login from "./views/login/login";
 import Map from "./views/panel/map";
 import Register from "./views/login/register";
 import Filter from "./views/panel/filter";
+import MyTabs from "./tabsNavigation";
 
 export interface NavegationProps {}
 
@@ -24,7 +25,11 @@ export function Navegation(props: NavegationProps) {
           component={Register}
           options={{ headerShown: false }}
         />
-        <root.Screen name="map" component={Map} />
+        <root.Screen
+          name="map"
+          component={MyTabs}
+          options={{ headerShown: false }}
+        />
         <root.Screen
           name="filter"
           component={Filter}
