@@ -64,7 +64,7 @@ export default function Filter(props: FilterProps) {
       </Text>
     ));
   }
-  //
+  
   const buscar = () => {
     var urlCiudadVehiculo =
       "http://" +

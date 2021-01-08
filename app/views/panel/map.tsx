@@ -31,7 +31,7 @@ export default function Map(props: MapProps) {
         description="Un molusco hambriento"
         >
 
-        <Image source={require('../../../assets/babu.png')} style={{height: 50, width:35}} />
+        <Image source={require('../../../assets/babu.png')} style={{height: 5, width:5}} />
 
         </Marker>
 
@@ -73,13 +73,7 @@ export default function Map(props: MapProps) {
 
         </Polyline>
 
-        <MapViewDirections
-          origin={{ latitude: 43.341084, longitude: -1.797485 }}
-          destination={{ latitude:43.339382, longitude: -1.789343  }}
-          apikey={"AIzaSyButSgyycKmcq72A-B25lr-A8G6skRQlc4"}
-          strokeWidth={3}
-          strokeColor="hotpink"
-        />
+       
      </MapView>
     </View>
   );
