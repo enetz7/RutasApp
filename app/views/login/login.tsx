@@ -47,8 +47,6 @@ export default function Login(this: any, props: LoginProps) {
             if (password === usuarios["contrasena"]) {
               console.log("HAY QUE LOGUEAR AL USUARIO");
               navegacion.navigate("filter", {});
-              // updateUsuario(usuarios["id"])
-              // console.log("USUARIO LOG: "+usuarioLogueado)
             } else {
               setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
               setMostrarError(true);
@@ -114,11 +112,6 @@ export default function Login(this: any, props: LoginProps) {
                 Registrarse();
               }}
             ></Button>
-          </View>
-          <View style={styles.footerline}>
-            <View>
-              <Text>Registrate</Text>
-            </View>
           </View>
         </View>
         <View style={styles.footer}></View>

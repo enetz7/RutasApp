@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import {ip} from "../../config/credenciales"
-import { StyleSheet,
-    Text,
-    View,
-    Linking,
-    TouchableOpacity,
-    ToastAndroid,
-    Dimensions,
-    TextInput,
-    Button
-  } from 'react-native';
-  import axios from 'axios';
-  import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-  import { NavigationContainer, useNavigation } from '@react-navigation/native';
-export interface RegisterProps {
-}
+import React, { useState } from "react";
+import { ip } from "../../config/credenciales";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Linking,
+  TouchableOpacity,
+  ToastAndroid,
+  Dimensions,
+  TextInput,
+  Button,
+} from "react-native";
+import axios from "axios";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+export interface RegisterProps {}
 
-export default function Register (props: RegisterProps) {
-
+export default function Register(props: RegisterProps) {
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("PRUEBA DE ERROR");
@@ -25,34 +24,32 @@ export default function Register (props: RegisterProps) {
   const navegacion = useNavigation();
 
   const Registrarse = () => {
-    if(nombre==""){
+    if (nombre == "") {
       setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
       setMostrarError(true);
-    }else{
-        axios({
-            method: 'post',
-            url: 'http://'+ip+':8080/usuario/newUsuario', 
-            data: {
-              nombre : nombre,
-              contrasena: password,
-              avatar : "avatares/avatarPorDefecto.jpg",
-              "admin" : false
-            }
-          }).then(() => {
-            navegacion.navigate("login",{});
-          });
-        }
-          //console.log('USUARIOS:', usuarios);
-    };
-
-
-  const onFinishFailed = (errorInfo: any) => {
-      console.log('Failed:', errorInfo);
+    } else {
+      axios({
+        method: "post",
+        url: "http://" + ip + ":8080/usuario/newUsuario",
+        data: {
+          nombre: nombre,
+          contrasena: password,
+          avatar: "avatares/avatarPorDefecto.jpg",
+          admin: false,
+        },
+      }).then(() => {
+        navegacion.navigate("login", {});
+      });
+    }
+    //console.log('USUARIOS:', usuarios);
   };
 
+  const onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+  };
 
-    return(
-      <KeyboardAwareScrollView style={{ flex: 1,paddingTop:100}}>
+  return (
+    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 100 }}>
       <View style={styles.container}>
         <View style={styles.login}>
           <View style={styles.header}>
@@ -81,7 +78,6 @@ export default function Register (props: RegisterProps) {
                   value={password}
                   secureTextEntry={true}
                 />
-                
               </View>
             </View>
           </View>
@@ -90,15 +86,18 @@ export default function Register (props: RegisterProps) {
               color="black"
               title="Registrarse"
               onPress={() => {
-               Registrarse();
+                Registrarse();
               }}
-            >
-            </Button>
+            ></Button>
+            <Text>{"\n"}</Text>
+            <Button
+              color="black"
+              title="Iniciar Sesion"
+              onPress={() => navegacion.navigate("login", {})}
+            ></Button>
           </View>
         </View>
-        <View style={styles.footer}>
-          
-        </View>
+        <View style={styles.footer}></View>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -171,4 +170,3 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-

@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @react-navigation
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @material-ui/core/utils
 
 PATH: 
-  C:\ProgramData\Miniconda3;C:\ProgramData\Miniconda3\Library\mingw-w64\bin;C:\ProgramData\Miniconda3\Library\usr\bin;C:\ProgramData\Miniconda3\Library\bin;C:\ProgramData\Miniconda3\Scripts;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\ProgramData\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;D:\Program Files (x86)\Brackets\command;C:\Program Files\Liquid Technologies\Liquid Studio 2019\XmlDataBinder17\Redist17\cpp\win32\bin;C:\Program Files\Liquid Technologies\Liquid Studio 2019\XmlDataBinder17\Redist17\cpp\win64\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\PuTTY\;C:\Program Files\Git\cmd;C:\Users\2dam3.HZ114487\AppData\Roaming\Python\Python38\Scripts;C:\Program Files (x86)\GnuWin32\bin;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\PostgreSQL\13\bin;C:\Program Files\nodejs\;C:\Program Files\Java\jdk-11.0.8\bin;search-ms:displayname=Resultados%20de%20la%20búsqueda%20en%20Windows%20(C%3A)&crumb=location:C%3A%5C\anaconda3;C:\Users\2dam3.HZ114487\anaconda3\Scripts;C:\Users\2dam3.HZ114487\AppData\Local\Microsoft\WindowsApps;C:\FlutterSDK\flutter\bin\cache\dart-sdk\bin;C:\FlutterSDK\flutter\bin;C:\Users\2dam3.HZ114487\AppData\Local\Pub\Cache\Bin;C:\Users\2dam3.HZ114487\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Docker Toolbox;C:\Users\2dam3.HZ114487\AppData\Roaming\Python\Python38\Scripts;C:\Users\2dam3.HZ114487\.local\bin;C:\Users\2dam3.HZ114487\AppData\Local\Yarn\bin;C:\Users\2dam3.HZ114487\AppData\Roaming\npm
+  C:\Program Files (x86)\GnuWin32\bin;C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Skype\Phone\;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\BaseX\bin;F:\Xampp\php;C:\ProgramData\ComposerSetup\bin;C:\Program Files\Git\cmd;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Users\enetz\AppData\Local\Programs\Python\Python39;C:\Users\enetz\AppData\Roaming\Python\Python39\Scripts;C:\Program Files\PuTTY\;C:\Users\enetz\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\enetz\AppData\Roaming\Composer\vendor\bin;C:\Users\enetz\Desktop\flutter\flutter sdk\flutter\bin;C:\Users\enetz\Desktop\flutter\flutter sdk\flutter\bin\cache\dart-sdk\bin;C:\Users\enetz\AppData\Roaming\npm;C:\Users\enetz\AppData\Local\Yarn\bin;C:\Users\enetz\AppData\Roaming\Python\Python39\site-packages\pipx;C:\Program Files\Docker\Docker;C:\Users\enetz\AppData\Roaming\Python\Python39\Scripts;C:\Users\enetz\AppData\Local\Programs\Python\Python39\;C:\Users\enetz\AppData\Local\Programs\Python\Python39\Scripts;
 
 Yarn version: 
   1.22.5
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@react-navigation: Request "https://registry.yarnpkg.com/@react-navigation" returned a 405
+  Error: https://registry.yarnpkg.com/@material-ui%2fcore/utils: Request "https://registry.yarnpkg.com/@material-ui%2fcore/utils" returned a 405
       at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:66106:18)
       at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:140749:22)
       at Request.emit (events.js:315:20)
@@ -37,6 +37,7 @@ npm manifest:
       "eject": "expo eject"
     },
     "dependencies": {
+      "@material-ui/icons": "^4.11.2",
       "@react-native-community/masked-view": "^0.1.10",
       "@react-native-community/slider": "^3.0.3",
       "@react-navigation/material-top-tabs": "^5.3.10",
@@ -46,6 +47,7 @@ npm manifest:
       "bootstrap": "^4.5.3",
       "expo": "~40.0.0",
       "expo-constants": "^9.3.5",
+      "expo-location": "^10.0.0",
       "expo-status-bar": "~1.0.3",
       "react": "^17.0.1",
       "react-bootstrap": "^1.4.0",
@@ -55,6 +57,7 @@ npm manifest:
       "react-native-gesture-handler": "^1.9.0",
       "react-native-keyboard-aware-scroll-view": "^0.9.3",
       "react-native-maps": "^0.27.1",
+      "react-native-maps-directions": "^1.8.0",
       "react-native-reanimated": "^1.13.2",
       "react-native-safe-area-context": "^3.1.9",
       "react-native-screens": "^2.16.1",
@@ -1062,7 +1065,7 @@ Lockfile:
       pirates "^4.0.0"
       source-map-support "^0.5.16"
   
-  "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.4.2", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+  "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.4.2", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
     version "7.12.5"
     resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
     integrity sha512-plcc+hbExy3McchJCEQG3knOsuh3HH+Prx1P6cLIkET/0dLuQDEnrT+s27Axgc9bqfsmNUNHfscgMUdBpC9xfg==
@@ -1284,6 +1287,13 @@ Lockfile:
       "@types/node" "*"
       "@types/yargs" "^15.0.0"
       chalk "^4.0.0"
+  
+  "@material-ui/icons@^4.11.2":
+    version "4.11.2"
+    resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-4.11.2.tgz#b3a7353266519cd743b6461ae9fdfcb1b25eb4c5"
+    integrity sha512-fQNsKX2TxBmqIGJCSi3tGTO/gZ+eJgWmMJkgDiOfyNaunNaxcklJQFaFogYcFl0qFuaEz1qaXYXboa/bUXVSOQ==
+    dependencies:
+      "@babel/runtime" "^7.4.4"
   
   "@popperjs/core@^2.5.3":
     version "2.6.0"
@@ -2731,7 +2741,7 @@ Lockfile:
       qs "^6.5.0"
       url-parse "^1.4.4"
   
-  expo-location@~10.0.0:
+  expo-location@^10.0.0, expo-location@~10.0.0:
     version "10.0.0"
     resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-10.0.0.tgz#2923411649434f2f079343b163b13c5c9eee8b2d"
     integrity sha512-QLEb0iaBv4/blLxxfKRj2/HPisY+1t+g6MgegqZ1j1U/0qih4dvzUQrxie9ZOZyQB9gnXFCRnZv3QzHEb52dcA==
@@ -4892,6 +4902,14 @@ Lockfile:
     dependencies:
       prop-types "^15.6.2"
       react-native-iphone-x-helper "^1.0.3"
+  
+  react-native-maps-directions@^1.8.0:
+    version "1.8.0"
+    resolved "https://registry.yarnpkg.com/react-native-maps-directions/-/react-native-maps-directions-1.8.0.tgz#ced452efeb153e54dfb9315480b0ae9539dfbcc7"
+    integrity sha512-7KWfPrvPLU8VP2nEqsnrWlOuylidlRWWDdk3lqT5Nb1q87FeyzNgA7Ib7n6cZlQwH4usTRlJSnzNo/yQ3u4AZw==
+    dependencies:
+      lodash.isequal "^4.5.0"
+      prop-types "^15.6.0"
   
   react-native-maps@^0.27.1:
     version "0.27.1"
