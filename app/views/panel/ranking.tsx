@@ -1,39 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { ip } from "../../config/credenciales";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Linking,
-  TouchableOpacity,
-  ToastAndroid,
-  Dimensions,
-  TextInput,
-  Button,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import axios from "axios";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import DropDownPicker from "react-native-dropdown-picker";
-import Slider from "@react-native-community/slider";
-import { render } from "react-dom";
-import { Ruta } from "../interface/rutas";
+import { FlatList } from "react-native-gesture-handler";
+import { Carta } from "./ranking/carta";
 
 export interface RankingProps {}
 
 export default function Ranking(props: RankingProps) {
+  const [puntuaciones, setPuntuaciones] = useState([]);
 
-  const [puntuaciones,setPuntuaciones]= useState([]);
+  function ranking() {
+    return (
+      <View>
+        <FlatList
+          data={puntuaciones}
+          keyExtractor={(item) => item.usuario}
+          renderItem={renderCarta}
+        ></FlatList>
+      </View>
+    );
 
-  function ranking(){
-    return puntuaciones.map((item,index)=>(
-    <Text key={index} style={styles.texto}>
-      {index}: {item["usuario"]}    Puntuacion: {item["puntos"]}
-      {"\n"}{" "}
-    </Text>
-    ));
+    // return puntuaciones.map((item,index)=>(
+    // <Text key={index} style={styles.texto}>
+    //   {index}: {item["usuario"]}    Puntuacion: {item["puntos"]}
+    //   {"\n"}{" "}
+    // </Text>
+    //));
   }
+
+  const renderCarta = ({ item, index }: { item: any; index: any }) => {
+    return (
+      <Carta
+        puntuacion={item.puntos}
+        ruta={item.ruta}
+        usuario={item.usuario}
+        indice={index}
+      ></Carta>
+    );
+  };
 
   useEffect(() => {
     var puntos = [] as any;
@@ -41,25 +47,22 @@ export default function Ranking(props: RankingProps) {
     axios
       .get(urlPuntuaciones)
       .then((response) => {
+        console.log(response.data);
         return response.data;
       })
       .then((puntuacion) => {
         puntuacion.map((numero: any) => {
           puntos.push({
-            usuario: numero["idUsuario"],
-            puntos: numero["puntos"],
-            ruta: numero["idRuta"]
+            usuario: numero["usuario"],
+            puntos: numero["puntuacion"],
+            ruta: numero["ruta"],
           });
         });
         setPuntuaciones(puntos);
       });
   }, []);
 
-  return (
-    <View>
-      {ranking()}
-    </View>
-  );
+  return <View>{ranking()}</View>;
 }
 
 const styles = StyleSheet.create({

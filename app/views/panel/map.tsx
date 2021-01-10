@@ -39,7 +39,7 @@ export default function Map(props: MapProps) {
   const [longitudeDelta, setLongitudeDelta] = useState(-0.0145859);
   const [latitude, setLatitude] = useState(40);
   const [longitude, setLongitude] = useState(10);
-
+  const [zoom, setZoom] = useState(false);
   const mapref = useRef<any>(null);
 
   useEffect(() => {
@@ -81,18 +81,20 @@ export default function Map(props: MapProps) {
   }
 
   function addZoom() {
+    setZoom(true);
     if (latitudeDelta < 0.005) {
       setLatitudeDelta(latitudeDelta);
       setLongitudeDelta(longitudeDelta);
     } else {
-      setLatitudeDelta(latitudeDelta - 0.01);
-      setLongitudeDelta(longitudeDelta - 0.01);
+      setLatitudeDelta(latitudeDelta * 0.8);
+      setLongitudeDelta(longitudeDelta * 0.8);
     }
   }
 
   function removeZoom() {
-    setLatitudeDelta(latitudeDelta + 0.01);
-    setLongitudeDelta(longitudeDelta + 0.01);
+    setZoom(true);
+    setLatitudeDelta(latitudeDelta * 1.2);
+    setLongitudeDelta(longitudeDelta * 1.2);
   }
 
   return (
@@ -107,15 +109,15 @@ export default function Map(props: MapProps) {
         ref={mapref}
         style={{ width: 600, height: 800 }}
         onRegionChangeComplete={(zona) => {
-          setLatitude(zona.latitude);
-          setLongitude(zona.longitude);
-          setLatitudeDelta(zona.latitudeDelta);
-          setLongitudeDelta(zona.longitudeDelta);
+          if (!zoom) {
+            setLatitude(zona.latitude);
+            setLongitude(zona.longitude);
+            setLatitudeDelta(zona.latitudeDelta);
+            setLongitudeDelta(zona.longitudeDelta);
+          } else {
+            setZoom(false);
+          }
         }}
-        // latitude: lat.value,
-        // longitude: long.value,
-        // latitudeDelta: latitudeDelta,
-        // longitudeDelta: longitudeDelta,
         showsUserLocation={true}
       >
         <Marker
