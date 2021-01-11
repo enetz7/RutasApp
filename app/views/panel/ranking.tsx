@@ -43,7 +43,7 @@ export default function Ranking(props: RankingProps) {
 
   useEffect(() => {
     var puntos = [] as any;
-    var urlPuntuaciones = "http://" + ip + ":8080/puntuaciones/all";
+    var urlPuntuaciones = "http://" + ip + ":80/puntuaciones/all";
     axios
       .get(urlPuntuaciones)
       .then((response) => {

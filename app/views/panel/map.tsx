@@ -97,6 +97,13 @@ export default function Map(props: MapProps) {
     setLongitudeDelta(longitudeDelta * 1.2);
   }
 
+
+  // function rutes(){
+    
+  // "https:// api.openrouteservice.org /v2/directions/foot-walking? api_key = 5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824& start = -1.7945859,43.341084& end = -1.797485,43.339382"
+  // }
+
+
   return (
     <View style={{ flex: 1 }}>
       <MapView

@@ -36,7 +36,7 @@ export default function Filter(props: FilterProps) {
   useEffect(() => {
     var ciudad = [] as any;
     var coordenada = [] as any;
-    var urlCiudades = "http://" + ip + ":8080/ciudades/all";
+    var urlCiudades = "http://" + ip + ":80/ciudades/all";
     axios
       .get(urlCiudades)
       .then((response) => {
@@ -69,7 +69,7 @@ export default function Filter(props: FilterProps) {
     var urlCiudadVehiculo =
       "http://" +
       ip +
-      ":8080/rutas/" +
+      ":80/rutas/" +
       valueCiudades +
       "&" +
       valueVehiculo +

@@ -25,7 +25,7 @@ export default function Login(this: any, props: LoginProps) {
   const navegacion = useNavigation();
 
   const onFinish = () => {
-    var urlNick = "http://" + ip + ":8080/usuario/" + nombre;
+    var urlNick = "http://" + ip + ":80/usuario/" + nombre;
     if (nombre == "") {
       setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
       setMostrarError(true);

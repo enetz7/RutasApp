@@ -30,7 +30,7 @@ export default function Register(props: RegisterProps) {
     } else {
       axios({
         method: "post",
-        url: "http://" + ip + ":8080/usuario/newUsuario",
+        url: "http://" + ip + ":80/usuario/newUsuario",
         data: {
           nombre: nombre,
           contrasena: password,
