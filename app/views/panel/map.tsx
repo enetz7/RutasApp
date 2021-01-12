@@ -7,14 +7,16 @@ import React, {
   MutableRefObject,
 } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
   LocationObject,
   requestPermissionsAsync,
   getCurrentPositionAsync,
 } from "expo-location";
+import axios from "axios";
 import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { Directions } from "react-native-gesture-handler";
 
 export interface MapProps {}
 
@@ -40,7 +42,10 @@ export default function Map(props: MapProps) {
   const [latitude, setLatitude] = useState(40);
   const [longitude, setLongitude] = useState(10);
   const [zoom, setZoom] = useState(false);
+  const [directions,setDirection] = useState(false);
+  const [polyLine,setPolyLine] = useState<any>(null);
   const mapref = useRef<any>(null);
+  
 
   useEffect(() => {
     let mounted = true;
@@ -53,7 +58,7 @@ export default function Map(props: MapProps) {
         }
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-
+        rutes();
         const ciudad = {
           latitude: Number(parametros.latitude),
           longitude: Number(parametros.longitude),
@@ -98,10 +103,52 @@ export default function Map(props: MapProps) {
   }
 
 
-  // function rutes(){
-    
-  // "https:// api.openrouteservice.org /v2/directions/foot-walking? api_key = 5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824& start = -1.7945859,43.341084& end = -1.797485,43.339382"
-  // }
+  function rutes(){
+    if(!directions){
+    axios({
+      method: "get",
+      url:"https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=-1.7945859,43.341084&end=-1.797485,43.339382"
+    }).then((response)=>{
+      console.log(response.data.features[0].geometry.coordinates)
+      setDirection(true);
+      setPolyLine(<View><Polyline
+        coordinates={response.data.features[0].geometry.coordinates.map((cordenada:any)=>{
+           return {latitude:cordenada[1],longitude:cordenada[0]}
+        })}
+          strokeColor="#B24112"
+          strokeColors={[
+            "#7F0000",
+            "#00000000",
+            "#B24112",
+            "#E5845C",
+            "#238C23",
+            "#7F0000",
+          ]}
+          strokeWidth={6}
+          
+        ></Polyline><Polyline
+
+        coordinates={[
+          { latitude: 43.141084, longitude: -1.597485 },
+          { latitude: 43.339382, longitude: -1.789343 },
+        ]}
+          strokeColor="#B24112"
+          strokeColors={[
+            "#7F0000",
+            "#00000000",
+            "#B24112",
+            "#E5845C",
+            "#238C23",
+            "#7F0000",
+          ]}
+          strokeWidth={6}
+          
+        ></Polyline>
+        </View>)
+    }
+    )
+  }
+  }
 
 
   return (
@@ -158,23 +205,7 @@ export default function Map(props: MapProps) {
             style={{ height: 50, width: 35 }}
           />
         </Marker>
-
-        <Polyline
-          coordinates={[
-            { latitude: 43.341084, longitude: -1.797485 },
-            { latitude: 43.339382, longitude: -1.789343 },
-          ]}
-          strokeColor="#B24112"
-          strokeColors={[
-            "#7F0000",
-            "#00000000",
-            "#B24112",
-            "#E5845C",
-            "#238C23",
-            "#7F0000",
-          ]}
-          strokeWidth={6}
-        ></Polyline>
+        {polyLine}
       </MapView>
       <TouchableOpacity
         onPress={() => {
@@ -191,6 +222,13 @@ export default function Map(props: MapProps) {
       <TouchableOpacity
         onPress={() => removeZoom()}
         style={styles.zoomButtonRemove}
+      >
+        <Ionicons name="remove" size={23} color="black" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => rutes()}
+        style={styles.centerButtonContainer}
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>

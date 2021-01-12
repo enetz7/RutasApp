@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Row } from "react-bootstrap";
 import { View, Text, StyleSheet, Image, ViewStyle } from "react-native";
 import { Usuario } from "../../interface/usuario";
+import { LinearGradient } from 'expo-linear-gradient';
 export interface CartaProps {
   usuario: Usuario;
   indice: number;
@@ -12,24 +13,36 @@ export interface CartaProps {
 export function Carta(props: CartaProps) {
   const image = "./avatares/avatarPorDefecto.jpg";
   let RankingStyle;
+  let gradientColor=[];
   if (props.indice == 0) {
     RankingStyle = styles.vistaPrimero;
+    gradientColor=["#B78628","#C69320","#DBA514","#EEB609","#FCC201"];
   } else if (props.indice == 1) {
     RankingStyle = styles.vistaSegundo;
+    gradientColor=["#D7D7D8","#C7C9CB","#AEB2B8","#959BA3","#848B98"];
   } else if (props.indice == 2) {
     RankingStyle = styles.vistaTercero;
+    gradientColor=["#804A00","#895E1A","#9C7A3C","#B08D57"];
   } else {
     RankingStyle = styles.vista;
+    gradientColor=["white","white"];
   }
   return (
-    <View style={RankingStyle}>
+    <LinearGradient
+       // Button Linear Gradient
+       colors={gradientColor}
+       style={RankingStyle}
+       >
+
+      
       <Image
         style={{ width: 50, height: 50, borderRadius: 25 }}
         source={require(image)}
       ></Image>
       <Text>{props.usuario.nombre}</Text>
       <Text style={styles.textoPuntuacion}>{props.puntuacion}</Text>
-    </View>
+
+    </LinearGradient>
   );
 }
 const styles = StyleSheet.create({
@@ -41,7 +54,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   vista: {
-    backgroundColor: "white",
     padding: 15,
     flexDirection: "row",
     marginHorizontal: 20,
@@ -55,7 +67,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   vistaPrimero: {
-    backgroundColor: "#FFE347",
     padding: 15,
     flexDirection: "row",
     marginHorizontal: 20,
@@ -70,7 +81,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   vistaSegundo: {
-    backgroundColor: "grey",
     padding: 15,
     flexDirection: "row",
     marginHorizontal: 20,
@@ -85,7 +95,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   vistaTercero: {
-    backgroundColor: "brown",
     padding: 15,
     flexDirection: "row",
     marginHorizontal: 20,
