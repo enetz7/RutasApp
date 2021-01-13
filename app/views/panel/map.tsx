@@ -34,6 +34,7 @@ export default function Map(props: MapProps) {
     timestamp: 0,
   };
 
+  var data: any[][] = [];
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -44,8 +45,9 @@ export default function Map(props: MapProps) {
   const [zoom, setZoom] = useState(false);
   const [directions,setDirection] = useState(false);
   const [polyLine,setPolyLine] = useState<any>(null);
+  const [coordenada,setCoordenada] = useState<any>([]);
   const mapref = useRef<any>(null);
-  
+  const [prueba,setPrueba] = useState([{startLa:"43.341084",startLon:"-1.7945859",endLa:"43.339382",endLong:"-1.797485"},{startLa:"43.341084",startLon:"-1.7945859",endLa:"42.339382",endLon:"-2.797485"}]);
 
   useEffect(() => {
     let mounted = true;
@@ -58,7 +60,9 @@ export default function Map(props: MapProps) {
         }
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-        rutes();
+        prueba.map((pop)=>{rutes();})
+       
+        //setCoordenada(data);
         const ciudad = {
           latitude: Number(parametros.latitude),
           longitude: Number(parametros.longitude),
@@ -103,50 +107,29 @@ export default function Map(props: MapProps) {
   }
 
 
-  function rutes(){
+  async function rutes(){
     if(!directions){
-    axios({
-      method: "get",
-      url:"https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=-1.7945859,43.341084&end=-1.797485,43.339382"
-    }).then((response)=>{
-      console.log(response.data.features[0].geometry.coordinates)
-      setDirection(true);
-      setPolyLine(<View><Polyline
-        coordinates={response.data.features[0].geometry.coordinates.map((cordenada:any)=>{
-           return {latitude:cordenada[1],longitude:cordenada[0]}
-        })}
-          strokeColor="#B24112"
-          strokeColors={[
-            "#7F0000",
-            "#00000000",
-            "#B24112",
-            "#E5845C",
-            "#238C23",
-            "#7F0000",
-          ]}
-          strokeWidth={6}
-          
-        ></Polyline><Polyline
-
-        coordinates={[
-          { latitude: 43.141084, longitude: -1.597485 },
-          { latitude: 43.339382, longitude: -1.789343 },
-        ]}
-          strokeColor="#B24112"
-          strokeColors={[
-            "#7F0000",
-            "#00000000",
-            "#B24112",
-            "#E5845C",
-            "#238C23",
-            "#7F0000",
-          ]}
-          strokeWidth={6}
-          
-        ></Polyline>
-        </View>)
-    }
-    )
+      let cosas = await axios({
+        method: "get",
+        //https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=${pop.startLon},${pop.startLa}&end=${pop.endLon},${pop.endLa}
+          //https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=-1.7945859,43.341084&end=-1.797485,43.339382
+        url:"https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=-1.7945859,43.341084&end=-1.797485,43.339382"
+      }).then((response)=>{
+        var cordenadas = [];
+        cordenadas.push(response.data.features[0].geometry.coordinates.map((cordenada:any)=>{
+            return {latitude:cordenada[1],longitude:cordenada[0]}
+        }))
+        console.log(cordenadas)
+        return cordenadas;
+        data.push(cordenadas);
+        setCoordenada(coordenada)
+        }
+        )
+        
+        setCoordenada(cosas[0]);
+        setDirection(true)
+        return cosas[0];
+        //console.log(coordenada)
   }
   }
 
@@ -174,6 +157,22 @@ export default function Map(props: MapProps) {
         }}
         showsUserLocation={true}
       >
+        {prueba.map((epa: any,i: string | number | null | undefined)=>{<Polyline
+          {...console.log(coordenada)}
+            coordinates={coordenada}
+              strokeColor="#B24112"
+              strokeColors={[
+                "#7F0000",
+                "#00000000",
+                "#B24112",
+                "#E5845C",
+                "#238C23",
+                "#7F0000",
+              ]}
+              strokeWidth={6}
+              
+            ></Polyline>})}
+        {/* {console.log(coordenada)} */}
         <Marker
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
@@ -205,7 +204,7 @@ export default function Map(props: MapProps) {
             style={{ height: 50, width: 35 }}
           />
         </Marker>
-        {polyLine}
+        
       </MapView>
       <TouchableOpacity
         onPress={() => {
@@ -226,12 +225,7 @@ export default function Map(props: MapProps) {
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => rutes()}
-        style={styles.centerButtonContainer}
-      >
-        <Ionicons name="remove" size={23} color="black" />
-      </TouchableOpacity>
+     
     </View>
   );
 }
