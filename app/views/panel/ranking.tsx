@@ -16,7 +16,7 @@ export default function Ranking(props: RankingProps) {
       <View>
         <FlatList
           data={puntuaciones}
-          keyExtractor={(item) => item.usuario}
+          keyExtractor={(item, index) => item.usuario + index}
           renderItem={renderCarta}
         ></FlatList>
       </View>
@@ -47,7 +47,6 @@ export default function Ranking(props: RankingProps) {
     axios
       .get(urlPuntuaciones)
       .then((response) => {
-   
         return response.data;
       })
       .then((puntuacion) => {
