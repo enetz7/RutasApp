@@ -13,6 +13,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Button,
+  TouchableHighlight,
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -24,10 +26,12 @@ import axios from "axios";
 import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Directions, PolyLineDirections } from "../interface/mapInterface";
+import { Modal } from "react-bootstrap";
 
 export interface MapProps {}
 
 export default function Map(props: MapProps) {
+  
   const local: LocationObject = {
     coords: {
       latitude: 43.3415452,
@@ -41,7 +45,7 @@ export default function Map(props: MapProps) {
     timestamp: 0,
   };
 
-  var data: any[][] = [];
+  let style = {display: "none"};
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -51,25 +55,110 @@ export default function Map(props: MapProps) {
   const [longitude, setLongitude] = useState(10);
   const [zoom, setZoom] = useState(false);
   const [directions, setDirection] = useState(false);
-  const [polyLine, setPolyLine] = useState<any>(null);
-  const [coordenada, setCoordenada] = useState<PolyLineDirections[]>([]);
+  const [polyLine, setPolyLine] = useState<any[]>([]);
+// const [coordenada, setCoordenada] = useState<PolyLineDirections[]>([]);
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
-  const [sigue, setSigue] = useState(true);
+  const [touchVisible, setTouchVisible] = useState(true);
   const [prueba, setPrueba] = useState<Directions[]>([
-    {
-      startLa: 43.341084,
-      startLon: -1.7945859,
-      endLa: 43.339382,
-      endLon: -1.797485,
-    },
     {
       startLa: 43.341084,
       startLon: -1.7945859,
       endLa: 43.339382,
       endLon: -2.797485,
     },
+    {
+      startLa: 43.341084,
+      startLon: -1.7945859,
+      endLa: 43.339382,
+      endLon: -1.797485,
+    },
+
   ]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+
+  const styles = StyleSheet.create({
+    centerButtonContainer: {
+      width: 60,
+      height: 60,
+      position: "absolute",
+      bottom: 30,
+      right: 10,
+      borderColor: "#191919",
+      borderWidth: 0,
+      borderRadius: 30,
+      backgroundColor: "#d2d2d2",
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 9,
+      },
+      shadowOpacity: 0.48,
+      shadowRadius: 11.95,
+      elevation: 18,
+      opacity: 0.9,
+    },
+    carousel: {
+      position: "absolute",
+      bottom: 25,
+    },
+    zoomButtonAdd: {
+      width: 40,
+      height: 40,
+      position: "absolute",
+      top: 10,
+      right: 10,
+      borderColor: "#191919",
+      borderWidth: 0,
+  
+      backgroundColor: "white",
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 9,
+      },
+      shadowOpacity: 0.48,
+      shadowRadius: 11.95,
+      elevation: 18,
+      opacity: 0.9,
+    },
+  
+    zoomButtonRemove: {
+      width: 40,
+      height: 40,
+      position: "absolute",
+      top: 51,
+      right: 10,
+      borderColor: "#191919",
+      borderWidth: 0,
+  
+      backgroundColor: "white",
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 9,
+      },
+      shadowOpacity: 0.48,
+      shadowRadius: 11.95,
+      elevation: 18,
+      opacity: 0.9,
+    },
+  });
+  
+
+
+
 
   useEffect(() => {
     let mounted = true;
@@ -80,21 +169,20 @@ export default function Map(props: MapProps) {
           setErrorMsg("Permission to access location was denied");
           return;
         }
+        setLoading(false);
         let location = await getCurrentPositionAsync({});
         setLocation(location);
+       
         await rutes();
-
-        //setCoordenada(data);
         const ciudad = {
           latitude: Number(parametros.latitude),
           longitude: Number(parametros.longitude),
           latitudeDelta: 0.015,
           longitudeDelta: 0.026,
         };
-
-        setLoading(false);
-        setSigue(false);
         await mapref.current.animateToRegion(ciudad, 1200);
+        setInterval(()=>{setTouchVisible(false)},2000)
+        clearInterval();
       })();
     }
     return function cleanup() {
@@ -132,8 +220,10 @@ export default function Map(props: MapProps) {
   }
 
   async function rutes() {
-    var ostra: PolyLineDirections[][] = [];
+    var coordenadas :any[] = [];
+    var index = 0;
     for (let p of prueba) {
+      index=index+1;
       const url =
         "https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
         p.startLon +
@@ -143,32 +233,40 @@ export default function Map(props: MapProps) {
         p.endLon +
         "," +
         p.endLa;
-      var coso: PolyLineDirections[] = [];
       await axios({
         method: "get",
-        //https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=${pop.startLon},${pop.startLa}&end=${pop.endLon},${pop.endLa}
-        //https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=-1.7945859,43.341084&end=-1.797485,43.339382
         url,
-      }).then((response) => {
-        coso.push(
-          response.data.features[0].geometry.coordinates.map(
-            (cordenada: any) => {
-              return { latitude: cordenada[1], longitude: cordenada[0] };
-            }
-          )
-        );
-        ostra.push(coso);
+      }).then((response) => { 
+          coordenadas.push(<Polyline
+            key={index}
+            coordinates={response.data.features[0].geometry.coordinates.map(
+              (cordenada: any) => {
+                return { latitude: cordenada[1], longitude: cordenada[0] };
+              }
+            )}
+            strokeColor="#B24112"
+            strokeColors={[
+              "#7F0000",
+              "#00000000",
+              "#B24112",
+              "#E5845C",
+              "#238C23",
+              "#7F0000",
+            ]}
+            strokeWidth={6}
+          ></Polyline>)
+            
       });
+      setPolyLine(coordenadas);
     }
 
-    setCoordenada(ostra[0]);
-    //console.log(ostra[0]);
   }
   if (loading) {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }} pointerEvents={touchVisible? "none":"auto"}>
+
       <MapView
         region={{
           latitude: latitude,
@@ -186,39 +284,12 @@ export default function Map(props: MapProps) {
             setLongitudeDelta(zona.longitudeDelta);
           } else {
             setZoom(false);
-          }
+          }   
         }}
+        
         showsUserLocation={true}
       >
-        {sigue
-          ? coordenada.map(
-              (objecto: any, i: string | number | null | undefined) => {
-                return (
-                  <Polyline
-                    key={i}
-                    {...console.log(objecto[0])}
-                    coordinates={objecto.map((datos: any) => {
-                      return {
-                        latitude: datos.latitude,
-                        longitude: datos.longitude,
-                      };
-                    })}
-                    strokeColor="#B24112"
-                    strokeColors={[
-                      "#7F0000",
-                      "#00000000",
-                      "#B24112",
-                      "#E5845C",
-                      "#238C23",
-                      "#7F0000",
-                    ]}
-                    strokeWidth={6}
-                  ></Polyline>
-                );
-              }
-            )
-          : null}
-        {/* {console.log(coordenada)} */}
+        
         <Marker
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
@@ -232,8 +303,6 @@ export default function Map(props: MapProps) {
 
         <Marker
           coordinate={{ latitude: 43.341084, longitude: -1.797485 }}
-          title="Puente Irun"
-          description="Aqui me encontre un calcetin"
         >
           <Image
             source={require("../../../assets/bandera.png")}
@@ -242,14 +311,13 @@ export default function Map(props: MapProps) {
         </Marker>
         <Marker
           coordinate={{ latitude: 43.339382, longitude: -1.789343 }}
-          title="El callejon"
-          description="Sus"
         >
           <Image
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
           />
         </Marker>
+        {polyLine}
       </MapView>
       <TouchableOpacity
         onPress={() => {
@@ -270,79 +338,8 @@ export default function Map(props: MapProps) {
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
     </View>
+
   );
+
 }
 
-const styles = StyleSheet.create({
-  centerButtonContainer: {
-    width: 60,
-    height: 60,
-    position: "absolute",
-    bottom: 30,
-    right: 10,
-    borderColor: "#191919",
-    borderWidth: 0,
-    borderRadius: 30,
-    backgroundColor: "#d2d2d2",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.48,
-    shadowRadius: 11.95,
-    elevation: 18,
-    opacity: 0.9,
-  },
-  carousel: {
-    position: "absolute",
-    bottom: 25,
-  },
-  zoomButtonAdd: {
-    width: 40,
-    height: 40,
-    position: "absolute",
-    top: 10,
-    right: 10,
-    borderColor: "#191919",
-    borderWidth: 0,
-
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.48,
-    shadowRadius: 11.95,
-    elevation: 18,
-    opacity: 0.9,
-  },
-
-  zoomButtonRemove: {
-    width: 40,
-    height: 40,
-    position: "absolute",
-    top: 51,
-    right: 10,
-    borderColor: "#191919",
-    borderWidth: 0,
-
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.48,
-    shadowRadius: 11.95,
-    elevation: 18,
-    opacity: 0.9,
-  },
-});
