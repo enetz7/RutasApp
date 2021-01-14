@@ -31,7 +31,6 @@ import { Modal } from "react-bootstrap";
 export interface MapProps {}
 
 export default function Map(props: MapProps) {
-  
   const local: LocationObject = {
     coords: {
       latitude: 43.3415452,
@@ -45,7 +44,7 @@ export default function Map(props: MapProps) {
     timestamp: 0,
   };
 
-  let style = {display: "none"};
+  let style = { display: "none" };
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -54,9 +53,8 @@ export default function Map(props: MapProps) {
   const [latitude, setLatitude] = useState(40);
   const [longitude, setLongitude] = useState(10);
   const [zoom, setZoom] = useState(false);
-  const [directions, setDirection] = useState(false);
   const [polyLine, setPolyLine] = useState<any[]>([]);
-// const [coordenada, setCoordenada] = useState<PolyLineDirections[]>([]);
+  // const [coordenada, setCoordenada] = useState<PolyLineDirections[]>([]);
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
@@ -73,92 +71,12 @@ export default function Map(props: MapProps) {
       endLa: 43.339382,
       endLon: -1.797485,
     },
-
   ]);
   const [isModalVisible, setModalVisible] = useState(false);
-  
+
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-
-
-  const styles = StyleSheet.create({
-    centerButtonContainer: {
-      width: 60,
-      height: 60,
-      position: "absolute",
-      bottom: 30,
-      right: 10,
-      borderColor: "#191919",
-      borderWidth: 0,
-      borderRadius: 30,
-      backgroundColor: "#d2d2d2",
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 9,
-      },
-      shadowOpacity: 0.48,
-      shadowRadius: 11.95,
-      elevation: 18,
-      opacity: 0.9,
-    },
-    carousel: {
-      position: "absolute",
-      bottom: 25,
-    },
-    zoomButtonAdd: {
-      width: 40,
-      height: 40,
-      position: "absolute",
-      top: 10,
-      right: 10,
-      borderColor: "#191919",
-      borderWidth: 0,
-  
-      backgroundColor: "white",
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 9,
-      },
-      shadowOpacity: 0.48,
-      shadowRadius: 11.95,
-      elevation: 18,
-      opacity: 0.9,
-    },
-  
-    zoomButtonRemove: {
-      width: 40,
-      height: 40,
-      position: "absolute",
-      top: 51,
-      right: 10,
-      borderColor: "#191919",
-      borderWidth: 0,
-  
-      backgroundColor: "white",
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 9,
-      },
-      shadowOpacity: 0.48,
-      shadowRadius: 11.95,
-      elevation: 18,
-      opacity: 0.9,
-    },
-  });
-  
-
-
-
 
   useEffect(() => {
     let mounted = true;
@@ -172,7 +90,7 @@ export default function Map(props: MapProps) {
         setLoading(false);
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-       
+
         await rutes();
         const ciudad = {
           latitude: Number(parametros.latitude),
@@ -181,7 +99,9 @@ export default function Map(props: MapProps) {
           longitudeDelta: 0.026,
         };
         await mapref.current.animateToRegion(ciudad, 1200);
-        setInterval(()=>{setTouchVisible(false)},2000)
+        setInterval(() => {
+          setTouchVisible(false);
+        }, 2000);
         clearInterval();
       })();
     }
@@ -220,10 +140,10 @@ export default function Map(props: MapProps) {
   }
 
   async function rutes() {
-    var coordenadas :any[] = [];
+    var coordenadas: any[] = [];
     var index = 0;
     for (let p of prueba) {
-      index=index+1;
+      index = index + 1;
       const url =
         "https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
         p.startLon +
@@ -236,8 +156,9 @@ export default function Map(props: MapProps) {
       await axios({
         method: "get",
         url,
-      }).then((response) => { 
-          coordenadas.push(<Polyline
+      }).then((response) => {
+        coordenadas.push(
+          <Polyline
             key={index}
             coordinates={response.data.features[0].geometry.coordinates.map(
               (cordenada: any) => {
@@ -254,19 +175,17 @@ export default function Map(props: MapProps) {
               "#7F0000",
             ]}
             strokeWidth={6}
-          ></Polyline>)
-            
+          ></Polyline>
+        );
       });
       setPolyLine(coordenadas);
     }
-
   }
   if (loading) {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ flex: 1 }} pointerEvents={touchVisible? "none":"auto"}>
-
+    <View style={{ flex: 1 }} pointerEvents={touchVisible ? "none" : "auto"}>
       <MapView
         region={{
           latitude: latitude,
@@ -284,12 +203,10 @@ export default function Map(props: MapProps) {
             setLongitudeDelta(zona.longitudeDelta);
           } else {
             setZoom(false);
-          }   
+          }
         }}
-        
         showsUserLocation={true}
       >
-        
         <Marker
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
@@ -301,17 +218,13 @@ export default function Map(props: MapProps) {
           />
         </Marker>
 
-        <Marker
-          coordinate={{ latitude: 43.341084, longitude: -1.797485 }}
-        >
+        <Marker coordinate={{ latitude: 43.341084, longitude: -1.797485 }}>
           <Image
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
           />
         </Marker>
-        <Marker
-          coordinate={{ latitude: 43.339382, longitude: -1.789343 }}
-        >
+        <Marker coordinate={{ latitude: 43.339382, longitude: -1.789343 }}>
           <Image
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
@@ -338,8 +251,79 @@ export default function Map(props: MapProps) {
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
     </View>
-
   );
-
 }
 
+const styles = StyleSheet.create({
+  centerButtonContainer: {
+    width: 60,
+    height: 60,
+    position: "absolute",
+    bottom: 30,
+    right: 10,
+    borderColor: "#191919",
+    borderWidth: 0,
+    borderRadius: 30,
+    backgroundColor: "#d2d2d2",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.48,
+    shadowRadius: 11.95,
+    elevation: 18,
+    opacity: 0.9,
+  },
+  carousel: {
+    position: "absolute",
+    bottom: 25,
+  },
+  zoomButtonAdd: {
+    width: 40,
+    height: 40,
+    position: "absolute",
+    top: 10,
+    right: 10,
+    borderColor: "#191919",
+    borderWidth: 0,
+
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.48,
+    shadowRadius: 11.95,
+    elevation: 18,
+    opacity: 0.9,
+  },
+
+  zoomButtonRemove: {
+    width: 40,
+    height: 40,
+    position: "absolute",
+    top: 51,
+    right: 10,
+    borderColor: "#191919",
+    borderWidth: 0,
+
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.48,
+    shadowRadius: 11.95,
+    elevation: 18,
+    opacity: 0.9,
+  },
+});

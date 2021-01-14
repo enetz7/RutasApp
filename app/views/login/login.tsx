@@ -33,7 +33,6 @@ export default function Login(this: any, props: LoginProps) {
       axios
         .get(urlNick)
         .then((response) => {
-          console.log(response.data);
           return response.data[0];
         })
         .then((usuarios) => {
@@ -43,9 +42,7 @@ export default function Login(this: any, props: LoginProps) {
           } else {
             setError("");
             setMostrarError(false);
-            console.log(usuarios["contrasena"]);
             if (password === usuarios["contrasena"]) {
-              console.log("HAY QUE LOGUEAR AL USUARIO");
               navegacion.navigate("filter", {});
             } else {
               setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
