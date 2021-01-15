@@ -3,8 +3,6 @@ import React, {
   useState,
   useEffect,
   useRef,
-  RefObject,
-  MutableRefObject,
 } from "react";
 import {
   View,
@@ -15,6 +13,8 @@ import {
   ActivityIndicator,
   Button,
   TouchableHighlight,
+  Dimensions,
+  TouchableWithoutFeedback
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -26,8 +26,10 @@ import axios from "axios";
 import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Directions, PolyLineDirections } from "../interface/mapInterface";
-import { Modal } from "react-bootstrap";
+import Modal from 'react-native-modal';
 
+const window = Dimensions.get('window');
+const screen = Dimensions.get('screen');
 export interface MapProps {}
 
 export default function Map(props: MapProps) {
@@ -44,7 +46,6 @@ export default function Map(props: MapProps) {
     timestamp: 0,
   };
 
-  let style = { display: "none" };
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -54,7 +55,6 @@ export default function Map(props: MapProps) {
   const [longitude, setLongitude] = useState(10);
   const [zoom, setZoom] = useState(false);
   const [polyLine, setPolyLine] = useState<any[]>([]);
-  // const [coordenada, setCoordenada] = useState<PolyLineDirections[]>([]);
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
@@ -72,11 +72,8 @@ export default function Map(props: MapProps) {
       endLon: -1.797485,
     },
   ]);
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [visibility, setModalVisibility] = useState(false);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
   useEffect(() => {
     let mounted = true;
@@ -90,7 +87,8 @@ export default function Map(props: MapProps) {
         setLoading(false);
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-
+        //setInterval(()=>{setGeoLocation() en la base de datos},10000)
+        //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         await rutes();
         const ciudad = {
           latitude: Number(parametros.latitude),
@@ -211,6 +209,7 @@ export default function Map(props: MapProps) {
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
           description="Un molusco hambriento"
+          
         >
           <Image
             source={require("../../../assets/babu.png")}
@@ -218,13 +217,16 @@ export default function Map(props: MapProps) {
           />
         </Marker>
 
-        <Marker coordinate={{ latitude: 43.341084, longitude: -1.797485 }}>
+        <Marker coordinate={{ latitude: 43.341084, longitude: -1.797485 }}
+        onPress={()=>{setModalVisibility(!visibility)}}
+        >
           <Image
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
           />
         </Marker>
-        <Marker coordinate={{ latitude: 43.339382, longitude: -1.789343 }}>
+        <Marker coordinate={{ latitude: 43.339382, longitude: -1.789343 }}
+        onPress={()=>{setModalVisibility(!visibility)}}>
           <Image
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
@@ -250,6 +252,33 @@ export default function Map(props: MapProps) {
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
+      <Modal
+          style={styles.modalContainer}
+          isVisible={visibility}
+          deviceWidth={window.width}
+          deviceHeight={window.height}
+          animationIn={"zoomIn"}
+          animationInTiming={1200}
+          animationOut={"fadeOut"}
+          animationOutTiming={1200}
+          customBackdrop={
+          <TouchableWithoutFeedback onPress={()=>setModalVisibility(!visibility)}>
+            <View style={{flex: 1}} />
+          </TouchableWithoutFeedback>
+          }
+        >
+          <View style={styles.modalText}>
+              <Text>I'm a simple Modal</Text>
+              <View style={styles.modalButton}>
+              <Button
+                color="black"
+                
+                onPress={() => {console.log("entre");setModalVisibility(!visibility)}}
+                title="Hide Modal"
+              />
+              </View>
+          </View>
+        </Modal>
     </View>
   );
 }
@@ -326,4 +355,25 @@ const styles = StyleSheet.create({
     elevation: 18,
     opacity: 0.9,
   },
+  modalContainer: {
+    flex:1,
+    marginTop: 22,
+    height:10,
+    width:10
+  },
+  modalButton:{
+    flex:2,
+    justifyContent: "center",
+    alignItems: "center",
+
+  },
+  modalText:{
+    alignItems:"center",
+    textAlign:"center",
+    margin:10,
+    width:window.width-60,
+    height:window.height-100,
+    backgroundColor:"white"
+  }
+
 });
