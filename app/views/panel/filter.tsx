@@ -60,26 +60,33 @@ export default function Filter(props: FilterProps) {
 
   function printList() {
     return arrayRuta.map((item, index) => (
-      <View key={index} style={styles.viewImage} >
-      <TouchableOpacity onPress={() => {
-          navegacion.navigate("map", {
-            
-            latitude: latitude,
-            longitude: longitude,
-          });
-        }
-      }style={styles.touchImage}>
-      <ImageBackground source={{uri:item.imagen}} key={index} 
-      style={styles.backgroundImage}>
-        
-      </ImageBackground>
-      <Text style={{fontWeight:"bold",fontSize:20,opacity:1}}>{item["nombre"]}{"\n"}</Text>
-        <Text style={{fontWeight:"500",fontSize:15,opacity:1}}>TIEMPO     {item["tiempo"]}</Text>
-      </TouchableOpacity>
+      <View key={index} style={styles.viewImage}>
+        <TouchableOpacity
+          onPress={() => {
+            navegacion.navigate("map", {
+              latitude: latitude,
+              longitude: longitude,
+            });
+          }}
+          style={styles.touchImage}
+        >
+          <ImageBackground
+            source={{ uri: item.imagen }}
+            key={index}
+            style={styles.backgroundImage}
+          ></ImageBackground>
+          <Text style={{ fontWeight: "bold", fontSize: 20, opacity: 1 }}>
+            {item["nombre"]}
+            {"\n"}
+          </Text>
+          <Text style={{ fontWeight: "500", fontSize: 15, opacity: 1 }}>
+            TIEMPO {item["tiempo"]}
+          </Text>
+        </TouchableOpacity>
       </View>
     ));
   }
-  
+
   const buscar = () => {
     var urlCiudadVehiculo =
       "http://" +
@@ -98,8 +105,15 @@ export default function Filter(props: FilterProps) {
       .then((rutas) => {
         var ruta: Ruta[] = [];
         rutas.map((numero: any) => {
-        ruta.push({nombre:numero.nombre,longitud:numero.longitud,vehiculo:numero.vehiculo,ciudad:numero.ciudad,dificultad:numero.dificultad,tiempo:numero.tiempo,imagen:numero.imagen[0].thumbUrl})
-        
+          ruta.push({
+            nombre: numero.nombre,
+            longitud: numero.longitud,
+            vehiculo: numero.vehiculo,
+            ciudad: numero.ciudad,
+            dificultad: numero.dificultad,
+            tiempo: numero.tiempo,
+            imagen: numero.imagen.thumbUrl,
+          });
         });
         setArrayRuta(ruta);
       });
@@ -129,7 +143,6 @@ export default function Filter(props: FilterProps) {
               });
             }}
           ></DropDownPicker>
-
           <Text style={styles.text}>Vehiculo</Text>
 
           <DropDownPicker
@@ -154,9 +167,7 @@ export default function Filter(props: FilterProps) {
             onValueChange={(value) => setSliderValue(Math.floor(value))}
           />
         </View>
-        <View>
-          {printList()}
-        </View>
+        <View>{printList()}</View>
         <View style={styles.buttons}>
           <Button
             color="black"
@@ -235,13 +246,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  touchImage:{
-    alignContent:"center",alignItems:"center",justifyContent:"center"
+  touchImage: {
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  viewImage:{
-    alignContent:"center",alignItems:"center",justifyContent:"center",paddingTop:50,paddingBottom:50
+  viewImage: {
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 50,
+    paddingBottom: 50,
   },
-  backgroundImage:{
-    width: 130,position:"absolute" ,height: 170,alignContent:"center",alignItems:"center",justifyContent:"center",opacity:0.4
-  }
+  backgroundImage: {
+    width: 130,
+    position: "absolute",
+    height: 170,
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.4,
+  },
 });
