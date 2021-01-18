@@ -63,7 +63,7 @@ export default function Filter(props: FilterProps) {
       <View key={index} style={styles.viewImage} >
       <TouchableOpacity onPress={() => {
           navegacion.navigate("map", {
-
+            
             latitude: latitude,
             longitude: longitude,
           });
