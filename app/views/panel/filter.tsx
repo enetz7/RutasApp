@@ -10,6 +10,8 @@ import {
   Dimensions,
   TextInput,
   Button,
+  Image,
+  ImageBackground,
 } from "react-native";
 
 import axios from "axios";
@@ -58,10 +60,23 @@ export default function Filter(props: FilterProps) {
 
   function printList() {
     return arrayRuta.map((item, index) => (
-      <Text key={index}>
-        Ruta:{item["nombre"]} Tiempo:{item["tiempo"]}
-        {"\n"}{" "}
-      </Text>
+      <View key={index} style={styles.viewImage} >
+      <TouchableOpacity onPress={() => {
+          navegacion.navigate("map", {
+
+            latitude: latitude,
+            longitude: longitude,
+          });
+        }
+      }style={styles.touchImage}>
+      <ImageBackground source={{uri:item.imagen}} key={index} 
+      style={styles.backgroundImage}>
+        
+      </ImageBackground>
+      <Text style={{fontWeight:"bold",fontSize:20,opacity:1}}>{item["nombre"]}{"\n"}</Text>
+        <Text style={{fontWeight:"500",fontSize:15,opacity:1}}>TIEMPO     {item["tiempo"]}</Text>
+      </TouchableOpacity>
+      </View>
     ));
   }
   
@@ -81,15 +96,17 @@ export default function Filter(props: FilterProps) {
         return response.data;
       })
       .then((rutas) => {
-        //var ruta: Ruta[];
         var ruta: Ruta[] = [];
-        rutas.map((numero: any) => ruta.push(numero));
+        rutas.map((numero: any) => {
+        ruta.push({nombre:numero.nombre,longitud:numero.longitud,vehiculo:numero.vehiculo,ciudad:numero.ciudad,dificultad:numero.dificultad,tiempo:numero.tiempo,imagen:numero.imagen[0].thumbUrl})
+        
+        });
         setArrayRuta(ruta);
       });
   };
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 100 }}>
+    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 50 }}>
       <View style={styles.container}>
         <View style={styles.form}>
           <Text style={styles.text}>Ciudades</Text>
@@ -138,7 +155,7 @@ export default function Filter(props: FilterProps) {
           />
         </View>
         <View>
-          <Text style={styles.text}>{printList()}</Text>
+          {printList()}
         </View>
         <View style={styles.buttons}>
           <Button
@@ -146,17 +163,6 @@ export default function Filter(props: FilterProps) {
             title="Buscar"
             onPress={() => {
               buscar();
-            }}
-          ></Button>
-          <Text>{"\n"}</Text>
-          <Button
-            color="black"
-            title="Mostrar mapa"
-            onPress={() => {
-              navegacion.navigate("map", {
-                latitude: latitude,
-                longitude: longitude,
-              });
             }}
           ></Button>
         </View>
@@ -229,4 +235,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  touchImage:{
+    alignContent:"center",alignItems:"center",justifyContent:"center"
+  },
+  viewImage:{
+    alignContent:"center",alignItems:"center",justifyContent:"center",paddingTop:50,paddingBottom:50
+  },
+  backgroundImage:{
+    width: 130,position:"absolute" ,height: 170,alignContent:"center",alignItems:"center",justifyContent:"center",opacity:0.4
+  }
 });
