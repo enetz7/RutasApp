@@ -1,9 +1,5 @@
 import { useRoute, RouteProp } from "@react-navigation/native";
-import React, {
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -14,7 +10,8 @@ import {
   Button,
   TouchableHighlight,
   Dimensions,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  FlatList,
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -26,10 +23,10 @@ import axios from "axios";
 import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Directions, PolyLineDirections } from "../interface/mapInterface";
-import Modal from 'react-native-modal';
-import {Questions} from './map/questions'
-const window = Dimensions.get('window');
-const screen = Dimensions.get('screen');
+import Modal from "react-native-modal";
+import { Questions } from "./map/questions";
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
 export interface MapProps {}
 
 export default function Map(props: MapProps) {
@@ -60,7 +57,6 @@ export default function Map(props: MapProps) {
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
 
-
   // const [prueba, setPrueba] = useState<Directions[]>([
   //   {
   //     startLa: 43.341084,
@@ -75,8 +71,8 @@ export default function Map(props: MapProps) {
   //     endLon: -1.797485,
   //   },
   // ]);
-  const [visibility, setModalVisibility] = useState<boolean[]>([false]);
-  const [modals,setModals] = useState<any[]>([]);
+  const [visibility, setModalVisibility] = useState(false);
+  const [questionsData, setQuestionsData] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -142,67 +138,80 @@ export default function Map(props: MapProps) {
   }
 
   async function markers() {
-    var modales: any[] = [];
     var marcadores: any[] = [];
     var visualizaciones: any[] = [];
     var marcas = parametros.loc as Directions[];
-    marcas.map((parametro,index)=>{
-    visualizaciones.push(false)
-    modales.push(<View key={index}>{parametro.oculto==3 ?<Questions
-    index={index}
-    preguntas={parametro.preguntas}
-    respuestas={parametro.respuestas}
-    />:null}</View>)
-
-    marcadores.push(<View key={index}>{parametro.oculto==3 ?<Marker key={index} coordinate={{ latitude: parametro.latitud, longitude: parametro.longitud }}
-    onPress={()=>{setModalVisibility([!visibility[index]])}}>
-      <Image
-        source={require("../../../assets/bandera.png")}
-        style={{ height: 50, width: 35 }}
-      />
-
-    </Marker>
-    :
-    <Marker key={index}
-    style={{opacity:0}}
-    coordinate={{ latitude: parametro.latitud, longitude: parametro.longitud }}
-    >
-      <Image
-        source={require("../../../assets/bandera.png")}
-        style={{ height: 50, width: 35 }}
-      />
-
-    </Marker>}</View>)
-    })
+    marcas.map((parametro, index) => {
+      visualizaciones.push(false);
+      marcadores.push(
+        <View key={index}>
+          {parametro.oculto == 3 ? (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parametro.latitud,
+                longitude: parametro.longitud,
+              }}
+              onPress={() => {
+                setQuestionsData({
+                  preguntas: parametro.preguntas,
+                  respuestas: parametro.respuestas[0],
+                });
+                setModalVisibility(!visibility);
+              }}
+            >
+              <Image
+                source={require("../../../assets/bandera.png")}
+                style={{ height: 50, width: 35 }}
+              />
+            </Marker>
+          ) : (
+            <Marker
+              key={index}
+              style={{ opacity: 0 }}
+              coordinate={{
+                latitude: parametro.latitud,
+                longitude: parametro.longitud,
+              }}
+            >
+              <Image
+                source={require("../../../assets/bandera.png")}
+                style={{ height: 50, width: 35 }}
+              />
+            </Marker>
+          )}
+        </View>
+      );
+    });
     setMarker(marcadores);
-    console.log(modales);
-    setModals(modales);
-    console.log(visualizaciones);
-    setModalVisibility(visualizaciones);
+    //console.log(modales);
+    //console.log(visualizaciones);
+    //setModalVisibility(visualizaciones);
   }
 
   async function rutes() {
     var modo = "";
-    if(parametros.vehiculo=="Bicicleta"){
-      modo="cycling-regular";
-    }else if(parametros.vehiculo=="Andando"){
-      modo="foot-walking";
-    }
-    else{
-      modo="driving-car";
+    if (parametros.vehiculo == "Bicicleta") {
+      modo = "cycling-regular";
+    } else if (parametros.vehiculo == "Andando") {
+      modo = "foot-walking";
+    } else {
+      modo = "driving-car";
     }
     var coordenadas: any[] = [];
     var localizaciones = parametros.loc as Directions[];
-    for (var i=0;i<localizaciones.length-1;i++) {
+    for (var i = 0; i < localizaciones.length - 1; i++) {
       const url =
-        "https://api.openrouteservice.org/v2/directions/"+modo+"?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
+        "https://api.openrouteservice.org/v2/directions/" +
+        modo +
+        "?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
         localizaciones[i].longitud +
         "," +
-        localizaciones[i].latitud  +
+        localizaciones[i].latitud +
         "&end=" +
-        localizaciones[i+1].longitud +
+        localizaciones[i + 1].longitud +
         "," +
-        localizaciones[i+1].latitud;
+        localizaciones[i + 1].latitud;
       await axios({
         method: "get",
         url,
@@ -306,29 +315,24 @@ export default function Map(props: MapProps) {
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
-      {modals}
-      {/* <Modal
-          style={styles.modalContainer}
-          isVisible={visibility[0]}
-          deviceWidth={window.width}
-          deviceHeight={window.height}
-          animationIn={"zoomIn"}
-          animationInTiming={1200}
-          animationOut={"fadeOut"}
-          animationOutTiming={1200}
-        >
-          <View style={styles.modalContainer}>
-              <Text>I'm a simple Modal</Text>
-              <View style={styles.modalButton}>
-              <Button
-                color="black"
-                
-                onPress={() => {setModalVisibility([!visibility[0]])}}
-                title="Hide Modal"
-              />
-              </View>
-          </View>
-        </Modal> */}
+
+      <Modal
+        style={styles.modalContainer}
+        isVisible={visibility}
+        deviceWidth={window.width}
+        deviceHeight={window.height}
+        animationIn={"zoomIn"}
+        animationInTiming={1000}
+        animationOut={"fadeOut"}
+        animationOutTiming={600}
+      >
+        <Questions
+          preguntas={questionsData == null ? null : questionsData.preguntas}
+          respuestas={questionsData == null ? null : questionsData.respuestas}
+          visibility={visibility}
+          setModalVisibility={setModalVisibility}
+        ></Questions>
+      </Modal>
     </View>
   );
 }
@@ -406,28 +410,25 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   modalContainer: {
-    flex:1,
-    alignItems:"center",
-    textAlign:"center",
-    margin:22,
-    width:window.width-60,
-    height:window.height-100,
-    backgroundColor:"white"
+    flex: 1,
+    alignItems: "center",
+    textAlign: "center",
+    margin: 22,
+    width: window.width - 60,
+    height: window.height - 100,
+    backgroundColor: "white",
   },
-  modalButton:{
-    flex:2,
+  modalButton: {
+    flex: 2,
     justifyContent: "center",
     alignItems: "center",
-
   },
-  modalText:{
-    flex:1,
-    alignItems:"center",
-    textAlign:"center",
-    margin:22,
-    width:window.width-60,
-    height:window.height-100,
-    
-  }
-
+  modalText: {
+    flex: 1,
+    alignItems: "center",
+    textAlign: "center",
+    margin: 22,
+    width: window.width - 60,
+    height: window.height - 100,
+  },
 });
