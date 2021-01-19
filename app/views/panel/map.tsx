@@ -27,7 +27,7 @@ import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Directions, PolyLineDirections } from "../interface/mapInterface";
 import Modal from 'react-native-modal';
-
+import {Questions} from './map/questions'
 const window = Dimensions.get('window');
 const screen = Dimensions.get('screen');
 export interface MapProps {}
@@ -55,25 +55,28 @@ export default function Map(props: MapProps) {
   const [longitude, setLongitude] = useState(10);
   const [zoom, setZoom] = useState(false);
   const [polyLine, setPolyLine] = useState<any[]>([]);
+  const [marker, setMarker] = useState<any[]>([]);
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
-  const [prueba, setPrueba] = useState<Directions[]>([
-    {
-      startLa: 43.341084,
-      startLon: -1.7945859,
-      endLa: 43.339382,
-      endLon: -2.797485,
-    },
-    {
-      startLa: 43.341084,
-      startLon: -1.7945859,
-      endLa: 43.339382,
-      endLon: -1.797485,
-    },
-  ]);
-  const [visibility, setModalVisibility] = useState(false);
 
+
+  // const [prueba, setPrueba] = useState<Directions[]>([
+  //   {
+  //     startLa: 43.341084,
+  //     startLon: -1.7945859,
+  //     endLa: 43.339382,
+  //     endLon: -2.797485,
+  //   },
+  //   {
+  //     startLa: 43.341084,
+  //     startLon: -1.7945859,
+  //     endLa: 43.339382,
+  //     endLon: -1.797485,
+  //   },
+  // ]);
+  const [visibility, setModalVisibility] = useState<boolean[]>([false]);
+  const [modals,setModals] = useState<any[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -90,6 +93,7 @@ export default function Map(props: MapProps) {
         //setInterval(()=>{setGeoLocation() en la base de datos},10000)
         //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         await rutes();
+        await markers();
         const ciudad = {
           latitude: Number(parametros.latitude),
           longitude: Number(parametros.longitude),
@@ -137,27 +141,75 @@ export default function Map(props: MapProps) {
     setLongitudeDelta(longitudeDelta * 1.2);
   }
 
+  async function markers() {
+    var modales: any[] = [];
+    var marcadores: any[] = [];
+    var visualizaciones: any[] = [];
+    var marcas = parametros.loc as Directions[];
+    marcas.map((parametro,index)=>{
+    visualizaciones.push(false)
+    modales.push(<View key={index}>{parametro.oculto==3 ?<Questions
+    index={index}
+    preguntas={parametro.preguntas}
+    respuestas={parametro.respuestas}
+    />:null}</View>)
+
+    marcadores.push(<View key={index}>{parametro.oculto==3 ?<Marker key={index} coordinate={{ latitude: parametro.latitud, longitude: parametro.longitud }}
+    onPress={()=>{setModalVisibility([!visibility[index]])}}>
+      <Image
+        source={require("../../../assets/bandera.png")}
+        style={{ height: 50, width: 35 }}
+      />
+
+    </Marker>
+    :
+    <Marker key={index}
+    style={{opacity:0}}
+    coordinate={{ latitude: parametro.latitud, longitude: parametro.longitud }}
+    >
+      <Image
+        source={require("../../../assets/bandera.png")}
+        style={{ height: 50, width: 35 }}
+      />
+
+    </Marker>}</View>)
+    })
+    setMarker(marcadores);
+    console.log(modales);
+    setModals(modales);
+    console.log(visualizaciones);
+    setModalVisibility(visualizaciones);
+  }
+
   async function rutes() {
+    var modo = "";
+    if(parametros.vehiculo=="Bicicleta"){
+      modo="cycling-regular";
+    }else if(parametros.vehiculo=="Andando"){
+      modo="foot-walking";
+    }
+    else{
+      modo="driving-car";
+    }
     var coordenadas: any[] = [];
-    var index = 0;
-    for (let p of prueba) {
-      index = index + 1;
+    var localizaciones = parametros.loc as Directions[];
+    for (var i=0;i<localizaciones.length-1;i++) {
       const url =
-        "https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
-        p.startLon +
+        "https://api.openrouteservice.org/v2/directions/"+modo+"?api_key=5b3ce3597851110001cf6248e30e7f7b8c944b66bc961354a6df7824&start=" +
+        localizaciones[i].longitud +
         "," +
-        p.startLa +
+        localizaciones[i].latitud  +
         "&end=" +
-        p.endLon +
+        localizaciones[i+1].longitud +
         "," +
-        p.endLa;
+        localizaciones[i+1].latitud;
       await axios({
         method: "get",
         url,
       }).then((response) => {
         coordenadas.push(
           <Polyline
-            key={index}
+            key={i}
             coordinates={response.data.features[0].geometry.coordinates.map(
               (cordenada: any) => {
                 return { latitude: cordenada[1], longitude: cordenada[0] };
@@ -192,6 +244,7 @@ export default function Map(props: MapProps) {
           longitudeDelta: longitudeDelta,
         }}
         ref={mapref}
+        moveOnMarkerPress={false}
         style={{ width: 600, height: 800 }}
         onRegionChangeComplete={(zona) => {
           if (!zoom) {
@@ -205,7 +258,7 @@ export default function Map(props: MapProps) {
         }}
         showsUserLocation={true}
       >
-        <Marker
+        {/* <Marker
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
           description="Un molusco hambriento"
@@ -231,8 +284,9 @@ export default function Map(props: MapProps) {
             source={require("../../../assets/bandera.png")}
             style={{ height: 50, width: 35 }}
           />
-        </Marker>
+        </Marker> */}
         {polyLine}
+        {marker}
       </MapView>
       <TouchableOpacity
         onPress={() => {
@@ -252,33 +306,29 @@ export default function Map(props: MapProps) {
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
-      <Modal
+      {modals}
+      {/* <Modal
           style={styles.modalContainer}
-          isVisible={visibility}
+          isVisible={visibility[0]}
           deviceWidth={window.width}
           deviceHeight={window.height}
           animationIn={"zoomIn"}
           animationInTiming={1200}
           animationOut={"fadeOut"}
           animationOutTiming={1200}
-          customBackdrop={
-          <TouchableWithoutFeedback onPress={()=>setModalVisibility(!visibility)}>
-            <View style={{flex: 1}} />
-          </TouchableWithoutFeedback>
-          }
         >
-          <View style={styles.modalText}>
+          <View style={styles.modalContainer}>
               <Text>I'm a simple Modal</Text>
               <View style={styles.modalButton}>
               <Button
                 color="black"
                 
-                onPress={() => {console.log("entre");setModalVisibility(!visibility)}}
+                onPress={() => {setModalVisibility([!visibility[0]])}}
                 title="Hide Modal"
               />
               </View>
           </View>
-        </Modal>
+        </Modal> */}
     </View>
   );
 }
@@ -357,9 +407,12 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex:1,
-    marginTop: 22,
-    height:10,
-    width:10
+    alignItems:"center",
+    textAlign:"center",
+    margin:22,
+    width:window.width-60,
+    height:window.height-100,
+    backgroundColor:"white"
   },
   modalButton:{
     flex:2,
@@ -368,12 +421,13 @@ const styles = StyleSheet.create({
 
   },
   modalText:{
+    flex:1,
     alignItems:"center",
     textAlign:"center",
-    margin:10,
+    margin:22,
     width:window.width-60,
     height:window.height-100,
-    backgroundColor:"white"
+    
   }
 
 });

@@ -12,4 +12,6 @@ export interface Ruta {
   tiempo: number;
 
   imagen: string;
+
+  loc:Array<Object>;
 }

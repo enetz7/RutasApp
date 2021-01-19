@@ -1,8 +1,10 @@
 export interface Directions {
-  startLa: number;
-  startLon: number;
-  endLa: number;
-  endLon: number;
+  latitud: number;
+  longitud: number;
+  nombre: string;
+  oculto: number;
+  preguntas:Array<string>
+  respuestas:Array<Array<string>>
 }
 
 export interface PolyLineDirections {

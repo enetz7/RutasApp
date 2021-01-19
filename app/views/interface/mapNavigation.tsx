@@ -7,4 +7,6 @@ export interface MapNavigation {
 interface params {
   latitude: string;
   longitude: string;
+  loc:Array<Object>;
+  vehiculo:string;
 }

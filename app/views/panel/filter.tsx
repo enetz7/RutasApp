@@ -4,13 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
-  Linking,
   TouchableOpacity,
-  ToastAndroid,
-  Dimensions,
-  TextInput,
   Button,
-  Image,
   ImageBackground,
 } from "react-native";
 
@@ -19,7 +14,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Slider from "@react-native-community/slider";
-import { render } from "react-dom";
 import { Ruta } from "../interface/rutas";
 export interface FilterProps {}
 
@@ -59,11 +53,13 @@ export default function Filter(props: FilterProps) {
   }, []);
 
   function printList() {
-    return arrayRuta.map((item, index) => (
+    return arrayRuta.map((item, index) =>(
       <View key={index} style={styles.viewImage}>
         <TouchableOpacity
           onPress={() => {
             navegacion.navigate("map", {
+              vehiculo:item.vehiculo,
+              loc:item.loc,
               latitude: latitude,
               longitude: longitude,
             });
@@ -104,6 +100,7 @@ export default function Filter(props: FilterProps) {
       })
       .then((rutas) => {
         var ruta: Ruta[] = [];
+        
         rutas.map((numero: any) => {
           ruta.push({
             nombre: numero.nombre,
@@ -113,6 +110,7 @@ export default function Filter(props: FilterProps) {
             dificultad: numero.dificultad,
             tiempo: numero.tiempo,
             imagen: numero.imagen.thumbUrl,
+            loc:numero.loc
           });
         });
         setArrayRuta(ruta);
