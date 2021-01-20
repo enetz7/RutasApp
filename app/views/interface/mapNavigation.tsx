@@ -9,4 +9,6 @@ interface params {
   longitude: string;
   loc:Array<Object>;
   vehiculo:string;
+  idRuta:string;
+  idUsuario:string;
 }

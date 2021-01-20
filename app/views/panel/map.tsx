@@ -12,6 +12,8 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   FlatList,
+  LogBox,
+  Alert,
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -25,8 +27,10 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Directions, PolyLineDirections } from "../interface/mapInterface";
 import Modal from "react-native-modal";
 import { Questions } from "./map/questions";
+import { ip } from "../../config/credenciales";
+
 const window = Dimensions.get("window");
-const screen = Dimensions.get("screen");
+
 export interface MapProps {}
 
 export default function Map(props: MapProps) {
@@ -42,7 +46,7 @@ export default function Map(props: MapProps) {
     },
     timestamp: 0,
   };
-
+  
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -56,23 +60,12 @@ export default function Map(props: MapProps) {
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
-
-  // const [prueba, setPrueba] = useState<Directions[]>([
-  //   {
-  //     startLa: 43.341084,
-  //     startLon: -1.7945859,
-  //     endLa: 43.339382,
-  //     endLon: -2.797485,
-  //   },
-  //   {
-  //     startLa: 43.341084,
-  //     startLon: -1.7945859,
-  //     endLa: 43.339382,
-  //     endLon: -1.797485,
-  //   },
-  // ]);
+  const [puntuacion,setPuntuacion] = useState(0);
   const [visibility, setModalVisibility] = useState(false);
   const [questionsData, setQuestionsData] = useState<any>(null);
+  const [numeroModal,setNumeroModal] = useState(0)
+  const [visualizarModals,setVisualizarModals] = useState<boolean[]>([]);
+  const [numeroPuntos,setNumeroPuntos]=useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -88,6 +81,10 @@ export default function Map(props: MapProps) {
         setLocation(location);
         //setInterval(()=>{setGeoLocation() en la base de datos},10000)
         //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
+        const existe = await buscarPartida();
+        if(!existe){
+          await iniciarRuta();
+        }
         await rutes();
         await markers();
         const ciudad = {
@@ -142,7 +139,7 @@ export default function Map(props: MapProps) {
     var visualizaciones: any[] = [];
     var marcas = parametros.loc as Directions[];
     marcas.map((parametro, index) => {
-      visualizaciones.push(false);
+      visualizaciones.push(true);
       marcadores.push(
         <View key={index}>
           {parametro.oculto == 3 ? (
@@ -153,11 +150,14 @@ export default function Map(props: MapProps) {
                 longitude: parametro.longitud,
               }}
               onPress={() => {
-                setQuestionsData({
-                  preguntas: parametro.preguntas,
-                  respuestas: parametro.respuestas[0],
-                });
-                setModalVisibility(!visibility);
+                if(visualizaciones[index]){
+                  setNumeroModal(index);
+                  setQuestionsData({
+                    preguntas: parametro.preguntas,
+                    respuestas: parametro.respuestas[0],
+                  });
+                  setModalVisibility(!visibility);
+                }
               }}
             >
               <Image
@@ -183,10 +183,9 @@ export default function Map(props: MapProps) {
         </View>
       );
     });
+    setNumeroPuntos(marcadores.length)
+    setVisualizarModals(visualizaciones);
     setMarker(marcadores);
-    //console.log(modales);
-    //console.log(visualizaciones);
-    //setModalVisibility(visualizaciones);
   }
 
   async function rutes() {
@@ -240,6 +239,53 @@ export default function Map(props: MapProps) {
       setPolyLine(coordenadas);
     }
   }
+
+  async function buscarPartida() {
+    //LogBox.ignoreLogs(['Warning: ...','Unhandled promise rejection: ...']);
+    LogBox.ignoreAllLogs();
+    const datos=await axios({
+      method: "get",
+      url:"http:" + ip + ":8080/puntuaciones/buscarPuntuacion/"+parametros.idRuta+"&"+parametros.idUsuario,
+    }).then((response)=>{
+      return response.data;
+    })
+    return datos;
+  }
+
+
+  async function iniciarRuta() {
+    await axios({
+      method: "post",
+      url:"http:" + ip + ":8080/puntuaciones/newPuntuacion",
+      data:{
+        idRuta:parametros.idRuta,
+        idUsuario:parametros.idUsuario,
+        puntos:0
+      }
+    })
+  }
+
+  async function resultado(acierto:boolean,numero:number){
+    var visuModal=visualizarModals;
+    if(acierto){
+      visuModal[numero]=false;
+      setVisualizarModals(visuModal);
+      Alert.alert("Resultado","Has acertado!!!\nPuntos restantes:"+(numeroPuntos-1))
+      setNumeroPuntos(numeroPuntos-1);
+      setPuntuacion(puntuacion+200);
+
+      // await axios({
+      //   method: "put",
+      //   url:"http:" + ip + ":8080/puntuaciones/updatePuntuaciones/{id}&{puntos}",
+      // })
+    }else{
+      Alert.alert("Resultado","Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes:"+(numeroPuntos-1))
+      setNumeroPuntos(numeroPuntos-1);
+      visuModal[numero]=false;
+      setVisualizarModals(visuModal);
+    }
+  }
+
   if (loading) {
     return <ActivityIndicator />;
   }
@@ -267,7 +313,7 @@ export default function Map(props: MapProps) {
         }}
         showsUserLocation={true}
       >
-        {/* <Marker
+        <Marker
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
           description="Un molusco hambriento"
@@ -278,22 +324,6 @@ export default function Map(props: MapProps) {
             style={{ height: 5, width: 5 }}
           />
         </Marker>
-
-        <Marker coordinate={{ latitude: 43.341084, longitude: -1.797485 }}
-        onPress={()=>{setModalVisibility(!visibility)}}
-        >
-          <Image
-            source={require("../../../assets/bandera.png")}
-            style={{ height: 50, width: 35 }}
-          />
-        </Marker>
-        <Marker coordinate={{ latitude: 43.339382, longitude: -1.789343 }}
-        onPress={()=>{setModalVisibility(!visibility)}}>
-          <Image
-            source={require("../../../assets/bandera.png")}
-            style={{ height: 50, width: 35 }}
-          />
-        </Marker> */}
         {polyLine}
         {marker}
       </MapView>
@@ -324,13 +354,15 @@ export default function Map(props: MapProps) {
         animationIn={"zoomIn"}
         animationInTiming={1000}
         animationOut={"fadeOut"}
-        animationOutTiming={600}
+        animationOutTiming={400}
       >
         <Questions
+          numeroModal={numeroModal}
           preguntas={questionsData == null ? null : questionsData.preguntas}
           respuestas={questionsData == null ? null : questionsData.respuestas}
           visibility={visibility}
           setModalVisibility={setModalVisibility}
+          resultado={resultado}
         ></Questions>
       </Modal>
     </View>

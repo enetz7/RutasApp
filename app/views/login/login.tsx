@@ -43,7 +43,9 @@ export default function Login(this: any, props: LoginProps) {
             setError("");
             setMostrarError(false);
             if (password === usuarios["contrasena"]) {
-              navegacion.navigate("filter", {});
+              navegacion.navigate("filter", {
+                usuario:usuarios
+              });
             } else {
               setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
               setMostrarError(true);

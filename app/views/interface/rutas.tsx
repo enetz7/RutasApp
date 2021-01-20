@@ -1,4 +1,7 @@
 export interface Ruta {
+
+  idRuta:string;
+
   nombre: string;
 
   longitud: number;

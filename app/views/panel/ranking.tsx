@@ -22,12 +22,6 @@ export default function Ranking(props: RankingProps) {
       </View>
     );
 
-    // return puntuaciones.map((item,index)=>(
-    // <Text key={index} style={styles.texto}>
-    //   {index}: {item["usuario"]}    Puntuacion: {item["puntos"]}
-    //   {"\n"}{" "}
-    // </Text>
-    //));
   }
 
   const renderCarta = ({ item, index }: { item: any; index: any }) => {

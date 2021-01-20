@@ -11,7 +11,7 @@ import {
 
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation,useRoute } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Slider from "@react-native-community/slider";
 import { Ruta } from "../interface/rutas";
@@ -27,6 +27,7 @@ export default function Filter(props: FilterProps) {
   const [longitude, setLongitude] = useState();
   const [arrayRuta, setArrayRuta] = useState<Ruta[]>([]);
   const navegacion = useNavigation();
+  const parametros = useRoute<any>().params;
   let controller;
 
   useEffect(() => {
@@ -62,6 +63,8 @@ export default function Filter(props: FilterProps) {
               loc:item.loc,
               latitude: latitude,
               longitude: longitude,
+              idRuta:item.idRuta,
+              idUsuario:parametros.usuario.id
             });
           }}
           style={styles.touchImage}
@@ -103,6 +106,7 @@ export default function Filter(props: FilterProps) {
         
         rutas.map((numero: any) => {
           ruta.push({
+            idRuta:numero._id,
             nombre: numero.nombre,
             longitud: numero.longitud,
             vehiculo: numero.vehiculo,
@@ -165,7 +169,7 @@ export default function Filter(props: FilterProps) {
             onValueChange={(value) => setSliderValue(Math.floor(value))}
           />
         </View>
-        <View>{printList()}</View>
+        <View style={{flexDirection:"row",justifyContent:"center"}}>{printList()}</View>
         <View style={styles.buttons}>
           <Button
             color="black"
@@ -255,6 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 50,
     paddingBottom: 50,
+    paddingLeft:30,
   },
   backgroundImage: {
     width: 130,

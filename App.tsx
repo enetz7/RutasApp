@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { LogBox, StyleSheet, Text, View } from 'react-native';
 import { Navegation } from './app/navegation';
 import Login from './app/views/login/login';
 
 
 export default function App() {
+  LogBox.ignoreLogs(['Warning: ...']);
   return (
       <Navegation></Navegation>
   );
