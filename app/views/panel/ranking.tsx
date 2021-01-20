@@ -5,13 +5,16 @@ import { StyleSheet, View } from "react-native";
 import axios from "axios";
 import { FlatList } from "react-native-gesture-handler";
 import { Carta } from "./ranking/carta";
+import { useRoute } from "@react-navigation/native";
+import { MapNavigation } from "../interface/mapNavigation";
 
 export interface RankingProps {}
 
 export default function Ranking(props: RankingProps) {
   const [puntuaciones, setPuntuaciones] = useState([]);
-
+  const parametros = useRoute<MapNavigation>().params;
   function ranking() {
+    console.log(puntuaciones);
     return (
       <View>
         <FlatList
@@ -21,7 +24,6 @@ export default function Ranking(props: RankingProps) {
         ></FlatList>
       </View>
     );
-
   }
 
   const renderCarta = ({ item, index }: { item: any; index: any }) => {
@@ -37,10 +39,12 @@ export default function Ranking(props: RankingProps) {
 
   useEffect(() => {
     var puntos = [] as any;
-    var urlPuntuaciones = "http://" + ip + ":8080/puntuaciones/all";
+    var urlPuntuaciones =
+      "http://" + ip + ":8080/puntuaciones/all/" + parametros.idRuta;
     axios
       .get(urlPuntuaciones)
       .then((response) => {
+        console.log(response.data);
         return response.data;
       })
       .then((puntuacion) => {
@@ -51,6 +55,7 @@ export default function Ranking(props: RankingProps) {
             ruta: numero["ruta"],
           });
         });
+
         setPuntuaciones(puntos);
       });
   }, []);

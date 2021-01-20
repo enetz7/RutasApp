@@ -15,7 +15,7 @@ export default function MyTabs() {
       <Tab.Navigator swipeEnabled={false}>
         <Tab.Screen name="Map" component={Map} initialParams={params} />
         <Tab.Screen name="Chat" component={Chat} />
-        <Tab.Screen name="Ranking" component={Ranking} />
+        <Tab.Screen name="Ranking" component={Ranking} initialParams={params} />
       </Tab.Navigator>
     </View>
   );

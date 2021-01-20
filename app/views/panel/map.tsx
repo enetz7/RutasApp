@@ -46,7 +46,7 @@ export default function Map(props: MapProps) {
     },
     timestamp: 0,
   };
-  
+
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -60,12 +60,12 @@ export default function Map(props: MapProps) {
   const mapref = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [touchVisible, setTouchVisible] = useState(true);
-  const [puntuacion,setPuntuacion] = useState(0);
+  const [puntuacion, setPuntuacion] = useState(0);
   const [visibility, setModalVisibility] = useState(false);
   const [questionsData, setQuestionsData] = useState<any>(null);
-  const [numeroModal,setNumeroModal] = useState(0)
-  const [visualizarModals,setVisualizarModals] = useState<boolean[]>([]);
-  const [numeroPuntos,setNumeroPuntos]=useState(0);
+  const [numeroModal, setNumeroModal] = useState(0);
+  const [visualizarModals, setVisualizarModals] = useState<boolean[]>([]);
+  const [numeroPuntos, setNumeroPuntos] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -82,7 +82,7 @@ export default function Map(props: MapProps) {
         //setInterval(()=>{setGeoLocation() en la base de datos},10000)
         //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         const existe = await buscarPartida();
-        if(!existe){
+        if (!existe) {
           await iniciarRuta();
         }
         await rutes();
@@ -150,7 +150,7 @@ export default function Map(props: MapProps) {
                 longitude: parametro.longitud,
               }}
               onPress={() => {
-                if(visualizaciones[index]){
+                if (visualizaciones[index]) {
                   setNumeroModal(index);
                   setQuestionsData({
                     preguntas: parametro.preguntas,
@@ -183,7 +183,7 @@ export default function Map(props: MapProps) {
         </View>
       );
     });
-    setNumeroPuntos(marcadores.length)
+    setNumeroPuntos(marcadores.length);
     setVisualizarModals(visualizaciones);
     setMarker(marcadores);
   }
@@ -243,45 +243,57 @@ export default function Map(props: MapProps) {
   async function buscarPartida() {
     //LogBox.ignoreLogs(['Warning: ...','Unhandled promise rejection: ...']);
     LogBox.ignoreAllLogs();
-    const datos=await axios({
+    const datos = await axios({
       method: "get",
-      url:"http:" + ip + ":8080/puntuaciones/buscarPuntuacion/"+parametros.idRuta+"&"+parametros.idUsuario,
-    }).then((response)=>{
+      url:
+        "http:" +
+        ip +
+        ":8080/puntuaciones/buscarPuntuacion/" +
+        parametros.idRuta +
+        "&" +
+        parametros.idUsuario,
+    }).then((response) => {
       return response.data;
-    })
+    });
     return datos;
   }
-
 
   async function iniciarRuta() {
     await axios({
       method: "post",
-      url:"http:" + ip + ":8080/puntuaciones/newPuntuacion",
-      data:{
-        idRuta:parametros.idRuta,
-        idUsuario:parametros.idUsuario,
-        puntos:0
-      }
-    })
+      url: "http:" + ip + ":8080/puntuaciones/newPuntuacion",
+      data: {
+        idRuta: parametros.idRuta,
+        idUsuario: parametros.idUsuario,
+        puntos: 0,
+      },
+    });
   }
 
-  async function resultado(acierto:boolean,numero:number){
-    var visuModal=visualizarModals;
-    if(acierto){
-      visuModal[numero]=false;
+  async function resultado(acierto: boolean, numero: number) {
+    var visuModal = visualizarModals;
+    if (acierto) {
+      visuModal[numero] = false;
       setVisualizarModals(visuModal);
-      Alert.alert("Resultado","Has acertado!!!\nPuntos restantes:"+(numeroPuntos-1))
-      setNumeroPuntos(numeroPuntos-1);
-      setPuntuacion(puntuacion+200);
+      Alert.alert(
+        "Resultado",
+        "Has acertado!!!\nPuntos restantes:" + (numeroPuntos - 1)
+      );
+      setNumeroPuntos(numeroPuntos - 1);
+      setPuntuacion(puntuacion + 200);
 
       // await axios({
       //   method: "put",
       //   url:"http:" + ip + ":8080/puntuaciones/updatePuntuaciones/{id}&{puntos}",
       // })
-    }else{
-      Alert.alert("Resultado","Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes:"+(numeroPuntos-1))
-      setNumeroPuntos(numeroPuntos-1);
-      visuModal[numero]=false;
+    } else {
+      Alert.alert(
+        "Resultado",
+        "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes:" +
+          (numeroPuntos - 1)
+      );
+      setNumeroPuntos(numeroPuntos - 1);
+      visuModal[numero] = false;
       setVisualizarModals(visuModal);
     }
   }
@@ -317,7 +329,6 @@ export default function Map(props: MapProps) {
           coordinate={{ latitude: 43.3415452, longitude: -1.7945859 }}
           title="Babu MC"
           description="Un molusco hambriento"
-          
         >
           <Image
             source={require("../../../assets/babu.png")}
