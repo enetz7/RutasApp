@@ -17,7 +17,7 @@ import Modal from "react-native-modal";
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
 type setModalVisibility = (visibility: boolean) => void;
-type resultado = (acierto:boolean,numero:number)=>void
+type resultado = (acierto:boolean,numero:number,oculto:boolean)=>void
 export interface QuestionsProps {
   numeroModal:number;
   preguntas: Array<string> | null;
@@ -43,9 +43,9 @@ export function Questions({
       onPress={()=>{
         setModalVisibility(!visibility);
         if(index==0){
-          resultado(true,numeroModal)
+          resultado(true,numeroModal,false)
         }else{
-          resultado(false,numeroModal)
+          resultado(false,numeroModal,false)
         };
         
       }}>
@@ -65,13 +65,13 @@ export function Questions({
         renderItem={renderDatos}
         keyExtractor={(item, index) => item + index}
       ></FlatList>
-      <Button
+      {/* <Button
         color="black"
         onPress={() => {
           setModalVisibility(!visibility);
         }}
         title="Hide Modal"
-      />
+      /> */}
     </View>
   );
 }

@@ -24,10 +24,11 @@ import Location, {
 import axios from "axios";
 import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { Directions, PolyLineDirections } from "../interface/mapInterface";
+import { Directions, PolyLineDirections,CoordenatesObjects } from "../interface/mapInterface";
 import Modal from "react-native-modal";
 import { Questions } from "./map/questions";
 import { ip } from "../../config/credenciales";
+import {getDistance} from "geolib"
 
 const window = Dimensions.get("window");
 
@@ -65,7 +66,20 @@ export default function Map(props: MapProps) {
   const [questionsData, setQuestionsData] = useState<any>(null);
   const [numeroModal, setNumeroModal] = useState(0);
   const [visualizarModals, setVisualizarModals] = useState<boolean[]>([]);
+  const [visualizarPosicion,setVisualizarPosicion] = useState<boolean[]>([]);
   const [numeroPuntos, setNumeroPuntos] = useState(0);
+
+  const pointIntoCircle = (obj_point:CoordenatesObjects, obj_circle_center:CoordenatesObjects, meters:number) => {
+    // console.log(obj_point);
+    // console.log(obj_circle_center);
+    let ky = 40000 / 360;
+    let kx = Math.cos(Math.PI * obj_circle_center.lat / 180.0) * ky;
+    let dx = Math.abs(obj_circle_center.lng - obj_point.lng) * kx;
+    let dy = Math.abs(obj_circle_center.lat - obj_point.lat) * ky;
+    const resultado = Math.sqrt(dx * dx + dy * dy) <= meters/1000;
+    return resultado;
+  }
+
 
   useEffect(() => {
     let mounted = true;
@@ -79,7 +93,8 @@ export default function Map(props: MapProps) {
         setLoading(false);
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-        //setInterval(()=>{setGeoLocation() en la base de datos},10000)
+        setInterval(async ()=>{let location = await getCurrentPositionAsync({});
+        setLocation(location)},10000)
         //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         const existe = await buscarPartida();
         if (!existe) {
@@ -137,28 +152,55 @@ export default function Map(props: MapProps) {
   async function markers() {
     var marcadores: any[] = [];
     var visualizaciones: any[] = [];
+    var visualizarPo: any[] = [];
     var marcas = parametros.loc as Directions[];
     marcas.map((parametro, index) => {
+      console.log(parametro.nombre);
+      visualizarPo.push(true);
       visualizaciones.push(true);
       marcadores.push(
         <View key={index}>
-          {parametro.oculto == 3 ? (
+          {parametro.oculto == 2 ? (
             <Marker
               key={index}
               coordinate={{
                 latitude: parametro.latitud,
                 longitude: parametro.longitud,
               }}
-              onPress={() => {
-                if (visualizaciones[index]) {
-                  setNumeroModal(index);
-                  setQuestionsData({
-                    preguntas: parametro.preguntas,
-                    respuestas: parametro.respuestas[0],
-                  });
-                  setModalVisibility(!visibility);
-                }
-              }}
+             onLayout={()=>{
+               
+                // setInterval(()=>{
+                //   //console.log(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
+                //   // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
+                //   if(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<300){
+                //     if (visualizaciones[index]) {
+                //         visualizaciones[index]=false;
+                //         setNumeroModal(index);
+                //         setQuestionsData({
+                //           preguntas: parametro.preguntas,
+                //           respuestas: parametro.respuestas[0],
+                //         });
+                //       setModalVisibility(!visibility);
+                //     }
+                //   }
+                // },1500)
+              
+            }}
+              //</View>pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},300)
+            // onPress={() => {
+            //   if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400) && !visualizarPo[index]){
+            //     console.log("porque")
+            //     console.log(visualizarPosicion[index])
+            //     if (visualizaciones[index]) {
+            //       setNumeroModal(index);
+            //       setQuestionsData({
+            //       preguntas: parametro.preguntas,
+            //       respuestas: parametro.respuestas[0],
+            //       });
+            //       setModalVisibility(!visibility);
+            //       }
+            //     }
+            // }}
             >
               <Image
                 source={require("../../../assets/bandera.png")}
@@ -173,6 +215,24 @@ export default function Map(props: MapProps) {
                 latitude: parametro.latitud,
                 longitude: parametro.longitud,
               }}
+
+
+              onLayout={()=>{
+                  // setInterval(()=>{
+                  //   // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
+                  //   console.log(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
+                  //   if(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<300){
+                  //     if (visualizaciones[index]) {
+                  //       visualizaciones[index]=false;
+                  //       resultado(true,index,true);
+                  //     }
+                    
+                  //   }
+                  // },1500)
+        
+              }}
+
+
             >
               <Image
                 source={require("../../../assets/bandera.png")}
@@ -184,6 +244,7 @@ export default function Map(props: MapProps) {
       );
     });
     setNumeroPuntos(marcadores.length);
+    //setVisualizarPosicion(visualizaciones);
     setVisualizarModals(visualizaciones);
     setMarker(marcadores);
   }
@@ -270,14 +331,24 @@ export default function Map(props: MapProps) {
     });
   }
 
-  async function resultado(acierto: boolean, numero: number) {
+  async function resultado(acierto: boolean, numero: number,oculto:boolean) {
     var visuModal = visualizarModals;
-    if (acierto) {
+    if(oculto){
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
       Alert.alert(
         "Resultado",
-        "Has acertado!!!\nPuntos restantes:" + (numeroPuntos - 1)
+        "Has encontrado un punto oculto!!!\nPuntos restantes: " + (numeroPuntos - 1)
+      );
+      setNumeroPuntos(numeroPuntos - 1);
+      setPuntuacion(puntuacion + 200);
+    }
+    else if (acierto) {
+      visuModal[numero] = false;
+      setVisualizarModals(visuModal);
+      Alert.alert(
+        "Resultado",
+        "Has acertado!!!\nPuntos restantes: " + (numeroPuntos - 1)
       );
       setNumeroPuntos(numeroPuntos - 1);
       setPuntuacion(puntuacion + 200);
@@ -286,10 +357,10 @@ export default function Map(props: MapProps) {
       //   method: "put",
       //   url:"http:" + ip + ":8080/puntuaciones/updatePuntuaciones/{id}&{puntos}",
       // })
-    } else {
+    } else{
       Alert.alert(
         "Resultado",
-        "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes:" +
+        "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +
           (numeroPuntos - 1)
       );
       setNumeroPuntos(numeroPuntos - 1);
@@ -475,3 +546,19 @@ const styles = StyleSheet.create({
     height: window.height - 100,
   },
 });
+// ({lat, lng}, {lat, lng}, int(metros))
+
+
+/** El punto está a 492 metros **/
+
+// console.log("Este está FUERA", pointIntoCircle(
+//   { lat: 42.842953, lng: -2.685813 },
+//   { lat: 42.84039768390093, lng: -2.690739957876932, },
+//   490
+// ));
+
+// console.log("Este está DENTRO", pointIntoCircle(
+//   { lat: 42.842953, lng: -2.685813 },
+//   { lat: 42.84039768390093, lng: -2.690739957876932, },
+//   495
+// ));

@@ -6,7 +6,6 @@ import Login from './app/views/login/login';
 
 
 export default function App() {
-  LogBox.ignoreLogs(['Warning: ...']);
   return (
       <Navegation></Navegation>
   );

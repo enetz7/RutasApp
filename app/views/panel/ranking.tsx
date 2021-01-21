@@ -14,7 +14,6 @@ export default function Ranking(props: RankingProps) {
   const [puntuaciones, setPuntuaciones] = useState([]);
   const parametros = useRoute<MapNavigation>().params;
   function ranking() {
-    console.log(puntuaciones);
     return (
       <View>
         <FlatList
@@ -44,7 +43,6 @@ export default function Ranking(props: RankingProps) {
     axios
       .get(urlPuntuaciones)
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .then((puntuacion) => {

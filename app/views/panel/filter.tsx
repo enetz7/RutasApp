@@ -80,6 +80,11 @@ export default function Filter(props: FilterProps) {
           </Text>
           <Text style={{ fontWeight: "500", fontSize: 15, opacity: 1 }}>
             TIEMPO {item["tiempo"]}
+            {"\n"}
+          </Text>
+          <Text style={{ fontWeight: "500", fontSize: 15, opacity: 1 }}>
+            Dificultad {item["dificultad"]}
+            {"\n"}
           </Text>
         </TouchableOpacity>
       </View>

@@ -11,3 +11,8 @@ export interface PolyLineDirections {
   latitude: number;
   longitude: number;
 }
+
+export interface CoordenatesObjects{
+  lat:number;
+  lng:number;
+}
