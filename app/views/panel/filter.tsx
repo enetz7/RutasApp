@@ -60,6 +60,7 @@ export default function Filter(props: FilterProps) {
           onPress={() => {
             navegacion.navigate("map", {
               vehiculo:item.vehiculo,
+              nombreRuta:item.nombre,
               loc:item.loc,
               latitude: latitude,
               longitude: longitude,

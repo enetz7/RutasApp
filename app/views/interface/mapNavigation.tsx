@@ -5,6 +5,7 @@ export interface MapNavigation {
 }
 
 interface params {
+  nombreRuta:string;
   latitude: string;
   longitude: string;
   loc:Array<Object>;

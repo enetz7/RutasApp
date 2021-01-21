@@ -14,7 +14,7 @@ export default function MyTabs() {
     <View style={{ marginTop: Constants.statusBarHeight, flex: 1 }}>
       <Tab.Navigator swipeEnabled={false}>
         <Tab.Screen name="Map" component={Map} initialParams={params} />
-        <Tab.Screen name="Chat" component={Chat} />
+        <Tab.Screen name="Chat" component={Chat} initialParams={params}/>
         <Tab.Screen name="Ranking" component={Ranking} initialParams={params} />
       </Tab.Navigator>
     </View>

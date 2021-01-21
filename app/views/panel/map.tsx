@@ -28,7 +28,7 @@ import { Directions, PolyLineDirections,CoordenatesObjects } from "../interface/
 import Modal from "react-native-modal";
 import { Questions } from "./map/questions";
 import { ip } from "../../config/credenciales";
-import {getDistance} from "geolib"
+import {getPreciseDistance} from "geolib"
 
 const window = Dimensions.get("window");
 
@@ -93,8 +93,8 @@ export default function Map(props: MapProps) {
         setLoading(false);
         let location = await getCurrentPositionAsync({});
         setLocation(location);
-        setInterval(async ()=>{let location = await getCurrentPositionAsync({});
-        setLocation(location)},10000)
+        setInterval(async ()=>{
+        setLocation(await getCurrentPositionAsync({}))},10000)
         //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         const existe = await buscarPartida();
         if (!existe) {
@@ -155,7 +155,6 @@ export default function Map(props: MapProps) {
     var visualizarPo: any[] = [];
     var marcas = parametros.loc as Directions[];
     marcas.map((parametro, index) => {
-      console.log(parametro.nombre);
       visualizarPo.push(true);
       visualizaciones.push(true);
       marcadores.push(
@@ -169,21 +168,24 @@ export default function Map(props: MapProps) {
               }}
              onLayout={()=>{
                
-                // setInterval(()=>{
-                //   //console.log(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
-                //   // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
-                //   if(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<300){
-                //     if (visualizaciones[index]) {
-                //         visualizaciones[index]=false;
-                //         setNumeroModal(index);
-                //         setQuestionsData({
-                //           preguntas: parametro.preguntas,
-                //           respuestas: parametro.respuestas[0],
-                //         });
-                //       setModalVisibility(!visibility);
-                //     }
-                //   }
-                // },1500)
+                setInterval(async ()=>{
+                  //console.log(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
+                  // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
+                  var locaT = await getCurrentPositionAsync({});
+                  //console.log(getPreciseDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
+                  if(getPreciseDistance({latitude:locaT.coords.latitude,longitude:locaT.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<70){
+                    if (visualizaciones[index]) {
+                        visualizaciones[index]=false;
+                        setNumeroModal(index);
+                        setQuestionsData({
+                          preguntas: parametro.preguntas,
+                          respuestas: parametro.respuestas[0],
+                        });
+                      setModalVisibility(!visibility);
+                      clearInterval();
+                    }
+                  }
+                },1500)
               
             }}
               //</View>pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},300)
@@ -218,17 +220,18 @@ export default function Map(props: MapProps) {
 
 
               onLayout={()=>{
-                  // setInterval(()=>{
-                  //   // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
-                  //   console.log(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud}));
-                  //   if(getDistance({latitude:location.coords.latitude,longitude:location.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<300){
-                  //     if (visualizaciones[index]) {
-                  //       visualizaciones[index]=false;
-                  //       resultado(true,index,true);
-                  //     }
+                  setInterval(async ()=>{
+                    var locaT = await getCurrentPositionAsync({});
+                    // if(pointIntoCircle({lng:location.coords.longitude,lat:location.coords.latitude},{lng:parametro.longitud,lat:parametro.latitud},400)){
+                    if(getPreciseDistance({latitude:locaT.coords.latitude,longitude:locaT.coords.longitude},{latitude:parametro.latitud,longitude:parametro.longitud})<70){
+                      if (visualizaciones[index]) {
+                        visualizaciones[index]=false;
+                        resultado(true,index,true);
+                        clearInterval();
+                      }
                     
-                  //   }
-                  // },1500)
+                    }
+                  },1500)
         
               }}
 
@@ -243,10 +246,10 @@ export default function Map(props: MapProps) {
         </View>
       );
     });
-    setNumeroPuntos(marcadores.length);
+    await setNumeroPuntos(marcadores.length);
     //setVisualizarPosicion(visualizaciones);
-    setVisualizarModals(visualizaciones);
-    setMarker(marcadores);
+    await setVisualizarModals(visualizaciones);
+    await setMarker(marcadores);
   }
 
   async function rutes() {
@@ -333,14 +336,19 @@ export default function Map(props: MapProps) {
 
   async function resultado(acierto: boolean, numero: number,oculto:boolean) {
     var visuModal = visualizarModals;
+    var punt = numeroPuntos;
+    console.log("antes");
+    console.log(numeroPuntos);
     if(oculto){
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
       Alert.alert(
         "Resultado",
-        "Has encontrado un punto oculto!!!\nPuntos restantes: " + (numeroPuntos - 1)
+        "Has encontrado un punto oculto!!!\nPuntos restantes: " + (punt - 1)
       );
-      setNumeroPuntos(numeroPuntos - 1);
+      setNumeroPuntos(punt - 1);
+      console.log("despues");
+      console.log(punt);
       setPuntuacion(puntuacion + 200);
     }
     else if (acierto) {
