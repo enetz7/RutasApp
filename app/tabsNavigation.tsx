@@ -12,9 +12,9 @@ export default function MyTabs() {
   const { params } = useRoute();
   return (
     <View style={{ marginTop: Constants.statusBarHeight, flex: 1 }}>
-      <Tab.Navigator swipeEnabled={false}>
+      <Tab.Navigator swipeEnabled={false} lazy={true}>
         <Tab.Screen name="Map" component={Map} initialParams={params} />
-        <Tab.Screen name="Chat" component={Chat} initialParams={params}/>
+        <Tab.Screen name="Chat" component={Chat} initialParams={params} />
         <Tab.Screen name="Ranking" component={Ranking} initialParams={params} />
       </Tab.Navigator>
     </View>

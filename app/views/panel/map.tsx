@@ -52,7 +52,9 @@ export default function Map(props: MapProps) {
     timestamp: 0,
   };
 
+  var antiguaPuntuacionOculta = 0;
   var visualizarOcultos = 0;
+  var idPartidaOculto = 0;
   const parametros = useRoute<MapNavigation>().params;
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
@@ -73,21 +75,25 @@ export default function Map(props: MapProps) {
   const [visualizarModals, setVisualizarModals] = useState<boolean[]>([]);
   const [visualizarPosicion, setVisualizarPosicion] = useState<boolean[]>([]);
   const [numeroPuntos, setNumeroPuntos] = useState<number>(0);
+  const [idPartida, setIdPartida] = useState<string>();
+  const [numeroPuntosOculto, setNumerosPuntosOcultos] = useState(0);
+  const [antiguaPuntuacion, setAntiguaPuntuacion] = useState(0);
+  const [userMarkers, setUserMarkers] = useState<any[]>([]);
 
-  const pointIntoCircle = (
-    obj_point: CoordenatesObjects,
-    obj_circle_center: CoordenatesObjects,
-    meters: number
-  ) => {
-    // console.log(obj_point);
-    // console.log(obj_circle_center);
-    let ky = 40000 / 360;
-    let kx = Math.cos((Math.PI * obj_circle_center.lat) / 180.0) * ky;
-    let dx = Math.abs(obj_circle_center.lng - obj_point.lng) * kx;
-    let dy = Math.abs(obj_circle_center.lat - obj_point.lat) * ky;
-    const resultado = Math.sqrt(dx * dx + dy * dy) <= meters / 1000;
-    return resultado;
-  };
+  // const pointIntoCircle = (
+  //   obj_point: CoordenatesObjects,
+  //   obj_circle_center: CoordenatesObjects,
+  //   meters: number
+  // ) => {
+  //   // console.log(obj_point);
+  //   // console.log(obj_circle_center);
+  //   let ky = 40000 / 360;
+  //   let kx = Math.cos((Math.PI * obj_circle_center.lat) / 180.0) * ky;
+  //   let dx = Math.abs(obj_circle_center.lng - obj_point.lng) * kx;
+  //   let dy = Math.abs(obj_circle_center.lat - obj_point.lat) * ky;
+  //   const resultado = Math.sqrt(dx * dx + dy * dy) <= meters / 1000;
+  //   return resultado;
+  // };
 
   useEffect(() => {
     let mounted = true;
@@ -111,6 +117,9 @@ export default function Map(props: MapProps) {
         }
         await rutes();
         await markers();
+        setInterval(async () => {
+          await marcarUsuarios();
+        }, 20000);
         const ciudad = {
           latitude: Number(parametros.latitude),
           longitude: Number(parametros.longitude),
@@ -158,12 +167,55 @@ export default function Map(props: MapProps) {
     setLongitudeDelta(longitudeDelta * 1.2);
   }
 
+  async function marcarUsuarios() {
+    let location = await getCurrentPositionAsync({});
+    let url =
+      "http:" +
+      ip +
+      ":8080/salas/newSalas/" +
+      parametros.idRuta +
+      "&" +
+      parametros.idUsuario +
+      "&" +
+      location.coords.latitude +
+      "&" +
+      location.coords.longitude;
+    await axios({
+      method: "get",
+      url,
+    }).then((response) => {
+      var marcadoresUs: any[] = [];
+      response.data.map((datos: any, index: any) => {
+        marcadoresUs.push(
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: Number(datos.latitude),
+              longitude: Number(datos.longitude),
+            }}
+          >
+            <Image
+              source={require("../../../assets/easter.png")}
+              style={{ height: 50, width: 35 }}
+            />
+          </Marker>
+        );
+      });
+      setUserMarkers(marcadoresUs);
+    });
+  }
+
   async function markers() {
     var marcadores: any[] = [];
     var visualizaciones: any[] = [];
     var visualizarPo: any[] = [];
+    var suma = 0;
     var marcas = parametros.loc as Directions[];
     marcas.map((parametro, index) => {
+      if (parametro.oculto != 2) {
+        suma = suma + 1;
+      }
+
       visualizarPo.push(true);
       visualizaciones.push(true);
       marcadores.push(
@@ -199,6 +251,7 @@ export default function Map(props: MapProps) {
                         preguntas: parametro.preguntas,
                         respuestas: parametro.respuestas[0],
                       });
+                      setNumeroPuntos(visualizarOcultos);
                       setModalVisibility(!visibility);
                     }
                   }
@@ -235,9 +288,10 @@ export default function Map(props: MapProps) {
                   ) {
                     if (visualizaciones[index]) {
                       visualizarOcultos = visualizarOcultos - 1;
+                      setNumeroPuntos(visualizarOcultos);
                       clearInterval(intervalo);
                       visualizaciones[index] = false;
-                      resultado(true, index, true);
+                      resultado(true, index, true, marcadores.length);
                     }
                   }
                 }, 1500);
@@ -253,6 +307,7 @@ export default function Map(props: MapProps) {
       );
     });
     visualizarOcultos = marcadores.length;
+    await setNumerosPuntosOcultos(suma);
     await setNumeroPuntos(marcadores.length);
     await setVisualizarModals(visualizaciones);
     await setMarker(marcadores);
@@ -322,7 +377,14 @@ export default function Map(props: MapProps) {
         "&" +
         parametros.idUsuario,
     }).then((response) => {
-      return response.data;
+      if (response.data == null || response.data == "") {
+        return false;
+      }
+      antiguaPuntuacionOculta = response.data.puntos;
+      setAntiguaPuntuacion(response.data.puntos);
+      idPartidaOculto = response.data._id;
+      setIdPartida(response.data._id);
+      return true;
     });
     return datos;
   }
@@ -336,11 +398,22 @@ export default function Map(props: MapProps) {
         idUsuario: parametros.idUsuario,
         puntos: 0,
       },
+    }).then((response) => {
+      antiguaPuntuacionOculta = response.data.puntos;
+      setAntiguaPuntuacion(response.data.puntos);
+      idPartidaOculto = response.data._id;
+      setIdPartida(response.data._id);
     });
   }
 
-  async function resultado(acierto: boolean, numero: number, oculto: boolean) {
+  async function resultado(
+    acierto: boolean,
+    numero: number,
+    oculto: boolean,
+    puntos: number
+  ) {
     var visuModal = visualizarModals;
+    var punto = puntos;
     if (oculto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
@@ -349,31 +422,45 @@ export default function Map(props: MapProps) {
         "Has encontrado un punto oculto!!!\nPuntos restantes: " +
           visualizarOcultos
       );
-      setNumeroPuntos(visualizarOcultos);
-      setPuntuacion(puntuacion + 200);
+      punto = 5 * puntos;
     } else if (acierto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
       Alert.alert(
         "Resultado",
-        "Has acertado!!!\nPuntos restantes: " + (numeroPuntos - 1)
+        "Has acertado!!!\nPuntos restantes: " + numeroPuntos
       );
-      setNumeroPuntos(numeroPuntos - 1);
-      setPuntuacion(puntuacion + 200);
-
-      // await axios({
-      //   method: "put",
-      //   url:"http:" + ip + ":8080/puntuaciones/updatePuntuaciones/{id}&{puntos}",
-      // })
+      punto = punto + 5;
+      setPuntuacion(punto);
     } else {
       Alert.alert(
         "Resultado",
         "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +
-          (numeroPuntos - 1)
+          numeroPuntos
       );
-      setNumeroPuntos(numeroPuntos - 1);
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
+    }
+    if (numeroPuntos == 0 && visualizarOcultos == 0) {
+      punto = punto + 5 * numeroPuntosOculto;
+      var value;
+      if (idPartida == null) {
+        value = idPartidaOculto;
+      } else {
+        value = idPartida;
+      }
+      if (punto > antiguaPuntuacionOculta && punto > antiguaPuntuacion) {
+        await axios({
+          method: "put",
+          url:
+            "http:" +
+            ip +
+            ":8080/puntuaciones/updatePuntuaciones/" +
+            value +
+            "&" +
+            punto,
+        });
+      }
     }
   }
 
@@ -414,6 +501,7 @@ export default function Map(props: MapProps) {
             style={{ height: 5, width: 5 }}
           />
         </Marker>
+        {userMarkers}
         {polyLine}
         {marker}
       </MapView>
@@ -447,6 +535,7 @@ export default function Map(props: MapProps) {
         animationOutTiming={400}
       >
         <Questions
+          puntuacion={puntuacion}
           numeroModal={numeroModal}
           preguntas={questionsData == null ? null : questionsData.preguntas}
           respuestas={questionsData == null ? null : questionsData.respuestas}

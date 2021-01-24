@@ -43,6 +43,7 @@ export default function Ranking(props: RankingProps) {
     axios
       .get(urlPuntuaciones)
       .then((response) => {
+        console.log(response.data);
         return response.data;
       })
       .then((puntuacion) => {
@@ -53,7 +54,6 @@ export default function Ranking(props: RankingProps) {
             ruta: numero["ruta"],
           });
         });
-
         setPuntuaciones(puntos);
       });
   }, []);

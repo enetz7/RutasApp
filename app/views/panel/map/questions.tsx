@@ -17,14 +17,20 @@ import Modal from "react-native-modal";
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
 type setModalVisibility = (visibility: boolean) => void;
-type resultado = (acierto:boolean,numero:number,oculto:boolean)=>void
+type resultado = (
+  acierto: boolean,
+  numero: number,
+  oculto: boolean,
+  puntos: number
+) => void;
 export interface QuestionsProps {
-  numeroModal:number;
+  numeroModal: number;
   preguntas: Array<string> | null;
   respuestas: Array<Array<string>> | null;
   visibility: boolean;
   setModalVisibility: setModalVisibility;
-  resultado:resultado;
+  resultado: resultado;
+  puntuacion: number;
 }
 
 export function Questions({
@@ -33,25 +39,28 @@ export function Questions({
   respuestas,
   visibility,
   setModalVisibility,
-  resultado
+  resultado,
+  puntuacion,
 }: QuestionsProps) {
   const renderDatos = ({ item, index }: { item: any; index: any }) => {
-    return(
-      <TouchableOpacity 
-      style={styles.vista} 
-      key={index}
-      onPress={()=>{
-        setModalVisibility(!visibility);
-        if(index==0){
-          resultado(true,numeroModal,false)
-        }else{
-          resultado(false,numeroModal,false)
-        };
-        
-      }}>
-        <Text style={{fontSize:15}} key={index}>{item}</Text>
+    return (
+      <TouchableOpacity
+        style={styles.vista}
+        key={index}
+        onPress={() => {
+          setModalVisibility(!visibility);
+          if (index == 0) {
+            resultado(true, numeroModal, false, puntuacion);
+          } else {
+            resultado(false, numeroModal, false, puntuacion);
+          }
+        }}
+      >
+        <Text style={{ fontSize: 15 }} key={index}>
+          {item}
+        </Text>
       </TouchableOpacity>
-    )
+    );
   };
   if (preguntas == null || respuestas == null) {
     return null;
@@ -59,7 +68,10 @@ export function Questions({
   const random = Math.floor(Math.random() * preguntas.length);
   return (
     <View style={styles.modalContainer}>
-      <Text style={{fontSize:20,fontWeight:"bold"}}>{preguntas[random]}{"\n"}</Text>
+      <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+        {preguntas[random]}
+        {"\n"}
+      </Text>
       <FlatList
         data={respuestas[random]}
         renderItem={renderDatos}
@@ -99,14 +111,14 @@ const styles = StyleSheet.create({
     width: window.width - 60,
     height: window.height - 100,
   },
-  vista:{
+  vista: {
     padding: 15,
     flexDirection: "row",
     marginHorizontal: 20,
     marginTop: 10,
     justifyContent: "space-around",
     alignItems: "center",
-    textAlign:"center",
+    textAlign: "center",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -114,10 +126,10 @@ const styles = StyleSheet.create({
       height: 6,
     },
     shadowOpacity: 0.39,
-    shadowRadius: 8.30,
+    shadowRadius: 8.3,
 
     elevation: 13,
-    width:window.width - 100,
-    height:100
-  }
+    width: window.width - 100,
+    height: 100,
+  },
 });
