@@ -8,10 +8,14 @@ import {
   FlatList,
   TextInput,
   Button,
+  Dimensions,
+
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MapNavigation } from "../interface/mapNavigation";
 import useChat from "./useChat";
 
+const window = Dimensions.get("window");
 export interface ChatProps {}
 
 export default function Chat(props: ChatProps) {
@@ -22,7 +26,7 @@ export default function Chat(props: ChatProps) {
   const handleNewMessageChange = (event: any) => {
     setNewMessage(event);
   };
-
+  
   const handleSendMessage = () => {
     if (newMessage !== "") {
       sendMessage(newMessage);
@@ -32,28 +36,42 @@ export default function Chat(props: ChatProps) {
   React.useEffect(() => {}, [messages]);
 
   return (
-    <View>
+    
+    <KeyboardAwareScrollView
+    contentContainerStyle={styles.container}
+    
+    //scrollEnabled
+    >
+    
       <FlatList
         data={messages}
-        renderItem={({ item, index }) => <Text key={index}>{item.body}</Text>}
+        renderItem={({ item, index }) =>
+        item.ownedByCurrentUser ?
+        <Text key={index} style={styles.myText}>{item.body}</Text>
+        :
+        <Text key={index} style={styles.otherText}>{item.body}</Text>
+        }
       ></FlatList>
-      <View style={styles.textinput}>
+      
+     
+       <View style={styles.textView}>
         <TextInput
-          style={{ marginLeft: 10, flex: 1 }}
+          style={styles.textInput}
           autoCapitalize={"none"}
           placeholder={"Mensaje"}
           onChangeText={(text: any) => handleNewMessageChange(text)}
           value={newMessage}
         />
-      </View>
-      <View style={styles.buttons}>
+        <View style={styles.buttons}>
         <Button
           color="black"
           title="Enviar"
           onPress={() => handleSendMessage()}
         ></Button>
       </View>
-    </View>
+      </View>
+    </KeyboardAwareScrollView>
+    
   );
 }
 
@@ -63,17 +81,50 @@ const styles = StyleSheet.create({
   },
   buttons: {
     color: "black",
-    justifyContent: "center",
-    alignItems: "center",
+    right:5,
+    marginVertical: 15,
+    marginLeft:10,
+    // justifyContent: "flex-end",
+    // alignItems: "flex-end",
+    // alignSelf:"flex-end",
+    // marginRight: 10,
+    // bottom:0,
   },
-  textinput: {
+  textView:{
+    flexDirection:"row",
+    position:"absolute",
+    top:window.height-140,
+  },
+  textInput: {
     color: "black",
     height: 50,
     borderWidth: 2,
     borderRadius: 10,
     marginVertical: 10,
     padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    justifyContent:"flex-start",
+    marginBottom: 0,
+    flexDirection: "column",
+    width:window.width - 80,
   },
+  myText:{
+    marginTop:10,
+    fontSize:19,
+    padding:10,
+    backgroundColor:"#4ABEF1",
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    alignSelf: 'flex-end',
+    marginRight: 10
+  },
+  otherText:{
+    marginTop:10,
+    fontSize:19,
+    padding:10,
+    backgroundColor:"#949698",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
+    marginLeft: 10
+  }
 });

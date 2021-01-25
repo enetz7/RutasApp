@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { ip } from "../../config/credenciales";
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
-const SOCKET_SERVER_URL = "http://" + ip + ":4000";
+const SOCKET_SERVER_URL = "http://"+ip+":4000";
 
 const useChat = (roomId: string) => {
   const [messages, setMessages] = useState<any[]>([]);
@@ -17,7 +17,6 @@ const useChat = (roomId: string) => {
 
     socketRef.current.on("connect", () => {
       socketRef.current.connect();
-      console.log(socketRef.current);
     });
     socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, (message: any) => {
       const incomingMessage = {
@@ -33,8 +32,6 @@ const useChat = (roomId: string) => {
   }, [roomId]);
 
   const sendMessage = (messageBody: any) => {
-    console.log(messageBody);
-    console.log("pedro");
     socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
       body: messageBody,
       senderId: socketRef.current.id,
