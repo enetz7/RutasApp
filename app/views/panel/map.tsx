@@ -195,7 +195,7 @@ export default function Map(props: MapProps) {
             }}
           >
             <Image
-              source={require("../../../assets/easter.png")}
+              source={require("../../../assets/personilla.png")}
               style={{ height: 50, width: 35 }}
             />
           </Marker>
@@ -258,10 +258,6 @@ export default function Map(props: MapProps) {
                 }, 1500);
               }}
             >
-              <Image
-                source={require("../../../assets/bandera.png")}
-                style={{ height: 50, width: 35 }}
-              />
             </Marker>
           ) : (
             <Marker
@@ -297,10 +293,7 @@ export default function Map(props: MapProps) {
                 }, 1500);
               }}
             >
-              <Image
-                source={require("../../../assets/bandera.png")}
-                style={{ height: 50, width: 35 }}
-              />
+             
             </Marker>
           )}
         </View>

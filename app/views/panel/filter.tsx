@@ -89,7 +89,8 @@ export default function Filter(props: FilterProps) {
           </Text>
         </TouchableOpacity>
       </View>
-    ));
+    )
+    );
   }
 
   const buscar = () => {
@@ -109,8 +110,13 @@ export default function Filter(props: FilterProps) {
       })
       .then((rutas) => {
         var ruta: Ruta[] = [];
-        
         rutas.map((numero: any) => {
+          var img ="";
+          if(numero.imagen==null){
+            img="../../../assets/easter.png";
+          }else{
+            img = numero.imagen.thumbUrl;
+          }
           ruta.push({
             idRuta:numero._id,
             nombre: numero.nombre,
@@ -119,7 +125,7 @@ export default function Filter(props: FilterProps) {
             ciudad: numero.ciudad,
             dificultad: numero.dificultad,
             tiempo: numero.tiempo,
-            imagen: numero.imagen.thumbUrl,
+            imagen: img,
             loc:numero.loc
           });
         });
@@ -175,7 +181,7 @@ export default function Filter(props: FilterProps) {
             onValueChange={(value) => setSliderValue(Math.floor(value))}
           />
         </View>
-        <View style={{flexDirection:"row",justifyContent:"center"}}>{printList()}</View>
+        <View style={{flexDirection:"row",justifyContent:"center",flexWrap:"wrap"}}>{printList()}</View>
         <View style={styles.buttons}>
           <Button
             color="black"
@@ -213,10 +219,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttons: {
-    padding: 20,
+    marginBottom:50,
     justifyContent: "center",
     alignItems: "center",
-    flex: 0.9,
+    flex: 1,
+    borderRadius:20,
   },
   footerline: {
     flex: 0.4,
@@ -246,7 +253,6 @@ const styles = StyleSheet.create({
   },
   textinput: {
     height: 50,
-
     borderWidth: 2,
     borderRadius: 10,
     marginVertical: 10,
@@ -264,7 +270,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 50,
-    paddingBottom: 50,
+    paddingBottom: 30,
     paddingLeft:30,
   },
   backgroundImage: {

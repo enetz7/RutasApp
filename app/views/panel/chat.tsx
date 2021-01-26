@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import * as React from "react";
+import React, {useState} from "react";
 
 import {
   View,
@@ -9,9 +9,11 @@ import {
   TextInput,
   Button,
   Dimensions,
-
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { set } from "react-native-reanimated";
 import { MapNavigation } from "../interface/mapNavigation";
 import useChat from "./useChat";
 
@@ -22,10 +24,12 @@ export default function Chat(props: ChatProps) {
   const parametros = useRoute<MapNavigation>().params;
   const { roomId } = { roomId: parametros.nombreRuta };
   const { messages, sendMessage } = useChat(roomId);
-  const [newMessage, setNewMessage] = React.useState("");
+  const [newMessage, setNewMessage] = useState("");
   const handleNewMessageChange = (event: any) => {
     setNewMessage(event);
   };
+
+  const [scrollView,setScrollView] = useState<any>()
   
   const handleSendMessage = () => {
     if (newMessage !== "") {
@@ -36,14 +40,10 @@ export default function Chat(props: ChatProps) {
   React.useEffect(() => {}, [messages]);
 
   return (
-    
     <KeyboardAwareScrollView
-    contentContainerStyle={styles.container}
-    
-    //scrollEnabled
+      contentContainerStyle={styles.container}
     >
-    
-      <FlatList
+    <FlatList
         data={messages}
         renderItem={({ item, index }) =>
         item.ownedByCurrentUser ?
@@ -53,8 +53,10 @@ export default function Chat(props: ChatProps) {
         }
       ></FlatList>
       
-     
-       <View style={styles.textView}>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.textView}
+      >
         <TextInput
           style={styles.textInput}
           autoCapitalize={"none"}
@@ -69,31 +71,25 @@ export default function Chat(props: ChatProps) {
           onPress={() => handleSendMessage()}
         ></Button>
       </View>
-      </View>
+      </KeyboardAvoidingView>
     </KeyboardAwareScrollView>
-    
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom:0,
+    marginBottom:0
   },
   buttons: {
     color: "black",
     right:5,
     marginVertical: 15,
     marginLeft:10,
-    // justifyContent: "flex-end",
-    // alignItems: "flex-end",
-    // alignSelf:"flex-end",
-    // marginRight: 10,
-    // bottom:0,
   },
   textView:{
     flexDirection:"row",
-    position:"absolute",
-    top:window.height-140,
   },
   textInput: {
     color: "black",
