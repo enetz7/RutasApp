@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import React, {useState} from "react";
+import React, { useRef, useState } from "react";
 
 import {
   View,
@@ -24,38 +24,48 @@ export default function Chat(props: ChatProps) {
   const parametros = useRoute<MapNavigation>().params;
   const { roomId } = { roomId: parametros.nombreRuta };
   const { messages, sendMessage } = useChat(roomId);
+  const flatlist = useRef<any>();
   const [newMessage, setNewMessage] = useState("");
   const handleNewMessageChange = (event: any) => {
     setNewMessage(event);
   };
 
-  const [scrollView,setScrollView] = useState<any>()
-  
+  const [scrollView, setScrollView] = useState<any>();
+
   const handleSendMessage = () => {
     if (newMessage !== "") {
       sendMessage(newMessage);
       setNewMessage("");
     }
   };
-  React.useEffect(() => {}, [messages]);
+  React.useEffect(() => {
+    flatlist.current.scrollToEnd({ animated: true });
+  }, [messages]);
 
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={styles.container}
+      scrollEnabled={true}
     >
-    <FlatList
+      <FlatList
+        ref={flatlist}
         data={messages}
         renderItem={({ item, index }) =>
-        item.ownedByCurrentUser ?
-        <Text key={index} style={styles.myText}>{item.body}</Text>
-        :
-        <Text key={index} style={styles.otherText}>{item.body}</Text>
+          item.ownedByCurrentUser ? (
+            <Text key={index} style={styles.myText}>
+              {item.body}
+            </Text>
+          ) : (
+            <Text key={index} style={styles.otherText}>
+              {item.body}
+            </Text>
+          )
         }
       ></FlatList>
-      
+
       <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.textView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.textView}
       >
         <TextInput
           style={styles.textInput}
@@ -65,12 +75,12 @@ export default function Chat(props: ChatProps) {
           value={newMessage}
         />
         <View style={styles.buttons}>
-        <Button
-          color="black"
-          title="Enviar"
-          onPress={() => handleSendMessage()}
-        ></Button>
-      </View>
+          <Button
+            color="black"
+            title="Enviar"
+            onPress={() => handleSendMessage()}
+          ></Button>
+        </View>
       </KeyboardAvoidingView>
     </KeyboardAwareScrollView>
   );
@@ -79,17 +89,17 @@ export default function Chat(props: ChatProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom:0,
-    marginBottom:0
+    paddingBottom: 0,
+    marginBottom: 0,
   },
   buttons: {
     color: "black",
-    right:5,
+    right: 5,
     marginVertical: 15,
-    marginLeft:10,
+    marginLeft: 10,
   },
-  textView:{
-    flexDirection:"row",
+  textView: {
+    flexDirection: "row",
   },
   textInput: {
     color: "black",
@@ -98,29 +108,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 10,
     padding: 10,
-    justifyContent:"flex-start",
+    justifyContent: "flex-start",
     marginBottom: 0,
     flexDirection: "column",
-    width:window.width - 80,
+    width: window.width - 80,
   },
-  myText:{
-    marginTop:10,
-    fontSize:19,
-    padding:10,
-    backgroundColor:"#4ABEF1",
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    alignSelf: 'flex-end',
-    marginRight: 10
+  myText: {
+    marginTop: 10,
+    fontSize: 19,
+    padding: 10,
+    backgroundColor: "#4ABEF1",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    alignSelf: "flex-end",
+    marginRight: 10,
   },
-  otherText:{
-    marginTop:10,
-    fontSize:19,
-    padding:10,
-    backgroundColor:"#949698",
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    alignSelf: 'flex-start',
-    marginLeft: 10
-  }
+  otherText: {
+    marginTop: 10,
+    fontSize: 19,
+    padding: 10,
+    backgroundColor: "#949698",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    alignSelf: "flex-start",
+    marginLeft: 10,
+  },
 });

@@ -5,16 +5,22 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Button,
+  //Button,
   ImageBackground,
 } from "react-native";
 
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation,useRoute } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Slider from "@react-native-community/slider";
 import { Ruta } from "../interface/rutas";
+import Button from "../component/button";
+
 export interface FilterProps {}
 
 export default function Filter(props: FilterProps) {
@@ -54,18 +60,18 @@ export default function Filter(props: FilterProps) {
   }, []);
 
   function printList() {
-    return arrayRuta.map((item, index) =>(
+    return arrayRuta.map((item, index) => (
       <View key={index} style={styles.viewImage}>
         <TouchableOpacity
           onPress={() => {
             navegacion.navigate("map", {
-              vehiculo:item.vehiculo,
-              nombreRuta:item.nombre,
-              loc:item.loc,
+              vehiculo: item.vehiculo,
+              nombreRuta: item.nombre,
+              loc: item.loc,
               latitude: latitude,
               longitude: longitude,
-              idRuta:item.idRuta,
-              idUsuario:parametros.usuario.id
+              idRuta: item.idRuta,
+              idUsuario: parametros.usuario.id,
             });
           }}
           style={styles.touchImage}
@@ -74,6 +80,12 @@ export default function Filter(props: FilterProps) {
             source={{ uri: item.imagen }}
             key={index}
             style={styles.backgroundImage}
+            imageStyle={{
+              borderRadius: 10,
+              shadowColor: "#000",
+              shadowOffset: { width: 5, height: 5 },
+              shadowOpacity: 0.9,
+            }}
           ></ImageBackground>
           <Text style={{ fontWeight: "bold", fontSize: 20, opacity: 1 }}>
             {item["nombre"]}
@@ -89,8 +101,7 @@ export default function Filter(props: FilterProps) {
           </Text>
         </TouchableOpacity>
       </View>
-    )
-    );
+    ));
   }
 
   const buscar = () => {
@@ -111,14 +122,14 @@ export default function Filter(props: FilterProps) {
       .then((rutas) => {
         var ruta: Ruta[] = [];
         rutas.map((numero: any) => {
-          var img ="";
-          if(numero.imagen==null){
-            img="../../../assets/easter.png";
-          }else{
+          var img = "";
+          if (numero.imagen == null) {
+            img = "../../../assets/easter.png";
+          } else {
             img = numero.imagen.thumbUrl;
           }
           ruta.push({
-            idRuta:numero._id,
+            idRuta: numero._id,
             nombre: numero.nombre,
             longitud: numero.longitud,
             vehiculo: numero.vehiculo,
@@ -126,7 +137,7 @@ export default function Filter(props: FilterProps) {
             dificultad: numero.dificultad,
             tiempo: numero.tiempo,
             imagen: img,
-            loc:numero.loc
+            loc: numero.loc,
           });
         });
         setArrayRuta(ruta);
@@ -181,15 +192,21 @@ export default function Filter(props: FilterProps) {
             onValueChange={(value) => setSliderValue(Math.floor(value))}
           />
         </View>
-        <View style={{flexDirection:"row",justifyContent:"center",flexWrap:"wrap"}}>{printList()}</View>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            paddingVertical: 30,
+            flexWrap: "wrap",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 50,
+          }}
+        >
+          {printList()}
+        </View>
         <View style={styles.buttons}>
-          <Button
-            color="black"
-            title="Buscar"
-            onPress={() => {
-              buscar();
-            }}
-          ></Button>
+          <Button label="Buscar" onPress={buscar}></Button>
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -203,6 +220,8 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     padding: 20,
+    fontSize: 18,
+
     justifyContent: "center",
     alignItems: "center",
   },
@@ -219,11 +238,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttons: {
-    marginBottom:50,
+    marginBottom: 50,
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    borderRadius:20,
+    borderRadius: 20,
   },
   footerline: {
     flex: 0.4,
@@ -269,9 +288,8 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 50,
-    paddingBottom: 30,
-    paddingLeft:30,
+    paddingHorizontal: 10,
+    paddingVertical: 30,
   },
   backgroundImage: {
     width: 130,
@@ -281,5 +299,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     opacity: 0.4,
+    // borderRadius: 10,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 5, height: 5 },
+    // shadowOpacity: 0.9,
+    // elevation: 5,
   },
 });
