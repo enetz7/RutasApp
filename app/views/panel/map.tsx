@@ -34,6 +34,7 @@ import { Questions } from "./map/questions";
 import { ip } from "../../config/credenciales";
 import { getPreciseDistance } from "geolib";
 
+
 const window = Dimensions.get("window");
 
 export interface MapProps {}
@@ -80,21 +81,6 @@ export default function Map(props: MapProps) {
   const [antiguaPuntuacion, setAntiguaPuntuacion] = useState(0);
   const [userMarkers, setUserMarkers] = useState<any[]>([]);
 
-  // const pointIntoCircle = (
-  //   obj_point: CoordenatesObjects,
-  //   obj_circle_center: CoordenatesObjects,
-  //   meters: number
-  // ) => {
-  //   // console.log(obj_point);
-  //   // console.log(obj_circle_center);
-  //   let ky = 40000 / 360;
-  //   let kx = Math.cos((Math.PI * obj_circle_center.lat) / 180.0) * ky;
-  //   let dx = Math.abs(obj_circle_center.lng - obj_point.lng) * kx;
-  //   let dy = Math.abs(obj_circle_center.lat - obj_point.lat) * ky;
-  //   const resultado = Math.sqrt(dx * dx + dy * dy) <= meters / 1000;
-  //   return resultado;
-  // };
-
   useEffect(() => {
     let mounted = true;
     if (mounted) {
@@ -110,7 +96,6 @@ export default function Map(props: MapProps) {
         setInterval(async () => {
           setLocation(await getCurrentPositionAsync({}));
         }, 10000);
-        //setInterval(()=>{getGeoLocation() de todos los usuarios,20000 y crear markers})
         const existe = await buscarPartida();
         if (!existe) {
           await iniciarRuta();
@@ -186,21 +171,23 @@ export default function Map(props: MapProps) {
     }).then((response) => {
       var marcadoresUs: any[] = [];
       response.data.map((datos: any, index: any) => {
-        marcadoresUs.push(
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: Number(datos.latitude),
-              longitude: Number(datos.longitude),
-            }}
-          >
-            <Image
-              source={require("../../../assets/personilla.png")}
-              style={{ height: 50, width: 35 }}
-            />
-          </Marker>
-        );
-      });
+        if(datos.latitude !=location.coords.latitude && datos.longitude != location.coords.longitude){
+          marcadoresUs.push(
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: Number(datos.latitude),
+                longitude: Number(datos.longitude),
+              }}
+            >
+              <Image
+                source={require("../../../assets/personilla.png")}
+                style={{ height: 50, width: 35 }}
+              />
+            </Marker>
+          );
+      }});
+      
       setUserMarkers(marcadoresUs);
     });
   }
@@ -258,6 +245,10 @@ export default function Map(props: MapProps) {
                 }, 1500);
               }}
             >
+              <Image
+                source={require("../../../assets/bandera.png")}
+                style={{ height: 40, width: 25 }}
+              />
             </Marker>
           ) : (
             <Marker
@@ -293,7 +284,10 @@ export default function Map(props: MapProps) {
                 }, 1500);
               }}
             >
-             
+             <Image
+                source={require("../../../assets/bandera.png")}
+                style={{ height: 40, width: 25 }}
+              />
             </Marker>
           )}
         </View>
@@ -461,7 +455,7 @@ export default function Map(props: MapProps) {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ flex: 1 }} pointerEvents={touchVisible ? "none" : "auto"}>
+    <View style={{ flex: 1}} pointerEvents={touchVisible ? "none" : "auto"}>
       <MapView
         region={{
           latitude: latitude,
@@ -516,7 +510,6 @@ export default function Map(props: MapProps) {
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
-
       <Modal
         style={styles.modalContainer}
         isVisible={visibility}
@@ -614,6 +607,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   modalContainer: {
+    alignSelf:"center",
     flex: 1,
     alignItems: "center",
     textAlign: "center",

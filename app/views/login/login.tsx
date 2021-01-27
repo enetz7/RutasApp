@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ip } from "../../config/credenciales";
 import {
   StyleSheet,
@@ -8,27 +8,26 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Dimensions,
-  TextInput,
-  Button,
+  TextInput
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-
+import { NavigationContainer, useNavigation, useRoute } from "@react-navigation/native";
+import Button from "../component/button";
+import DropdownAlert from 'react-native-dropdownalert';
 export interface LoginProps {}
 
 export default function Login(this: any, props: LoginProps) {
+
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("PRUEBA DE ERROR");
-  const [mostrarError, setMostrarError] = useState(false);
   const navegacion = useNavigation();
+  const dropDownAlertRef = useRef<any>();
 
   const onFinish = () => {
     var urlNick = "http://" + ip + ":8080/usuario/" + nombre;
     if (nombre == "") {
-      setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
-      setMostrarError(true);
+      dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
     } else {
       axios
         .get(urlNick)
@@ -37,21 +36,17 @@ export default function Login(this: any, props: LoginProps) {
         })
         .then((usuarios) => {
           if (usuarios == null) {
-            setError("El usuario introducido no existe");
-            setMostrarError(true);
+            dropDownAlertRef.current.alertWithType('error', 'Error', 'El usuario introducido no existe');
           } else {
-            setError("");
-            setMostrarError(false);
             if (password === usuarios["contrasena"]) {
-              navegacion.navigate("filter", {
+              dropDownAlertRef.current.alertWithType('success', 'Correcto', 'Login existoso');
+              setTimeout(()=>{navegacion.navigate("filter", {
                 usuario:usuarios
-              });
+              })},1000)
             } else {
-              setError("COMPRUEBA LOS DATOS INTRODUCIDOS");
-              setMostrarError(true);
+              dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
             }
           }
-          //console.log('USUARIOS:', usuarios);
         });
     }
   };
@@ -60,12 +55,11 @@ export default function Login(this: any, props: LoginProps) {
     navegacion.navigate("register", {});
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 100 }}>
+    <KeyboardAwareScrollView style={{ flex: 1}}>
+       <View style={{flex:1}}>
+        <DropdownAlert ref={ref => dropDownAlertRef.current=ref} />
+      </View>
       <View style={styles.container}>
         <View style={styles.login}>
           <View style={styles.header}>
@@ -99,17 +93,15 @@ export default function Login(this: any, props: LoginProps) {
           </View>
           <View style={styles.buttons}>
             <Button
-              color="black"
-              title="Iniciar Sesion"
-              onPress={() => onFinish()}
+              label="Iniciar Sesion"
+              onPress={onFinish}
+              width={200}
             ></Button>
             <Text>{"\n"}</Text>
             <Button
-              color="black"
-              title="Registrarse"
-              onPress={() => {
-                Registrarse();
-              }}
+              label="Registrarse"
+              onPress={Registrarse}
+              width={200}
             ></Button>
           </View>
         </View>
@@ -122,6 +114,7 @@ export default function Login(this: any, props: LoginProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop:100,
   },
   login: {
     flex: 1,

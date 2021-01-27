@@ -199,14 +199,14 @@ export default function Filter(props: FilterProps) {
             paddingVertical: 30,
             flexWrap: "wrap",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "center",
             paddingHorizontal: 50,
           }}
         >
           {printList()}
         </View>
         <View style={styles.buttons}>
-          <Button label="Buscar" onPress={buscar}></Button>
+          <Button label="Buscar" onPress={buscar} width={250}></Button>
         </View>
       </View>
     </KeyboardAwareScrollView>

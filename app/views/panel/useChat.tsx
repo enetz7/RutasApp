@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-//import socketIOClient from "socket.io-client";
 import { io } from "socket.io-client";
 import { ip } from "../../config/credenciales";
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";

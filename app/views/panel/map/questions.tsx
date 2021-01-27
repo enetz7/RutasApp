@@ -44,6 +44,7 @@ export function Questions({
 }: QuestionsProps) {
   const renderDatos = ({ item, index }: { item: any; index: any }) => {
     return (
+      <View style={{paddingBottom:10}}>
       <TouchableOpacity
         style={styles.vista}
         key={index}
@@ -60,6 +61,7 @@ export function Questions({
           {item}
         </Text>
       </TouchableOpacity>
+      </View>
     );
   };
   if (preguntas == null || respuestas == null) {
@@ -77,13 +79,6 @@ export function Questions({
         renderItem={renderDatos}
         keyExtractor={(item, index) => item + index}
       ></FlatList>
-      {/* <Button
-        color="black"
-        onPress={() => {
-          setModalVisibility(!visibility);
-        }}
-        title="Hide Modal"
-      /> */}
     </View>
   );
 }
@@ -97,11 +92,7 @@ const styles = StyleSheet.create({
     width: window.width - 60,
     height: window.height - 100,
     backgroundColor: "white",
-  },
-  modalButton: {
-    flex: 2,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingBottom:20,
   },
   modalText: {
     flex: 1,
@@ -119,17 +110,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     textAlign: "center",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.39,
-    shadowRadius: 8.3,
-
-    elevation: 13,
     width: window.width - 100,
     height: 100,
+    shadowColor: 'rgba(0,0,0, .4)',
+    shadowOffset: { height: 1, width: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 1,
+    backgroundColor: '#fff',
+    elevation: 2,
+    borderRadius:20,
   },
 });

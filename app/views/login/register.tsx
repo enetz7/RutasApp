@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ip } from "../../config/credenciales";
 import {
   StyleSheet,
@@ -8,25 +8,24 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Dimensions,
-  TextInput,
-  Button,
+  TextInput
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import Button from "../component/button";
+import DropdownAlert from 'react-native-dropdownalert';
 export interface RegisterProps {}
 
 export default function Register(props: RegisterProps) {
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("PRUEBA DE ERROR");
-  const [mostrarError, setMostrarError] = useState(false);
   const navegacion = useNavigation();
+  const dropDownAlertRef = useRef<any>();
 
   const Registrarse = () => {
     if (nombre == "") {
-      setError("COMPPUEBA LOS DATOS INTRODUCIDOS");
-      setMostrarError(true);
+      dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
     } else {
       axios({
         method: "post",
@@ -38,18 +37,17 @@ export default function Register(props: RegisterProps) {
           admin: false,
         },
       }).then(() => {
-        navegacion.navigate("login", {});
+        dropDownAlertRef.current.alertWithType('success', 'Correcto', 'Se ha registrado correctamente');
+        setTimeout(()=>{navegacion.navigate("login", {})},1000);
       });
     }
-    //console.log('USUARIOS:', usuarios);
-  };
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
+  }
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 100 }}>
+    <KeyboardAwareScrollView style={{ flex: 1}}>
+      <View style={{flex:1}}>
+        <DropdownAlert ref={ref => dropDownAlertRef.current=ref} />
+      </View>
       <View style={styles.container}>
         <View style={styles.login}>
           <View style={styles.header}>
@@ -83,17 +81,15 @@ export default function Register(props: RegisterProps) {
           </View>
           <View style={styles.buttons}>
             <Button
-              color="black"
-              title="Registrarse"
-              onPress={() => {
-                Registrarse();
-              }}
+              label="Registrarse"
+              onPress={Registrarse}
+              width={200}
             ></Button>
             <Text>{"\n"}</Text>
             <Button
-              color="black"
-              title="Iniciar Sesion"
+              label="Iniciar Sesion"
               onPress={() => navegacion.navigate("login", {})}
+              width={200}
             ></Button>
           </View>
         </View>
@@ -106,6 +102,7 @@ export default function Register(props: RegisterProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop:100,
   },
   login: {
     flex: 1,

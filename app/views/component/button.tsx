@@ -5,12 +5,13 @@ import { RectButton } from "react-native-gesture-handler";
 export interface ButtonProps {
   label: string;
   onPress: () => void;
+  width:number;
 }
 
-const Button = ({ label, onPress }: ButtonProps) => {
+const Button = ({ label, width ,onPress }: ButtonProps) => {
   return (
     <RectButton
-      style={[styles.container, { backgroundColor: "black" }]}
+      style={[styles.container, {width, backgroundColor: "black" }]}
       {...{ onPress }}
     >
       <Text style={[styles.label, { color: "white" }]}>{label}</Text>
