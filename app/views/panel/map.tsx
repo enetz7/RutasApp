@@ -13,7 +13,8 @@ import {
   TouchableWithoutFeedback,
   FlatList,
   LogBox,
-  Alert,
+  //Alert,
+  AppState
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -33,7 +34,7 @@ import Modal from "react-native-modal";
 import { Questions } from "./map/questions";
 import { ip } from "../../config/credenciales";
 import { getPreciseDistance } from "geolib";
-
+import { Alert } from "./map/alert";
 
 const window = Dimensions.get("window");
 
@@ -52,6 +53,9 @@ export default function Map(props: MapProps) {
     },
     timestamp: 0,
   };
+
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   var antiguaPuntuacionOculta = 0;
   var visualizarOcultos = 0;
@@ -74,12 +78,13 @@ export default function Map(props: MapProps) {
   const [questionsData, setQuestionsData] = useState<any>(null);
   const [numeroModal, setNumeroModal] = useState(0);
   const [visualizarModals, setVisualizarModals] = useState<boolean[]>([]);
-  const [visualizarPosicion, setVisualizarPosicion] = useState<boolean[]>([]);
   const [numeroPuntos, setNumeroPuntos] = useState<number>(0);
   const [idPartida, setIdPartida] = useState<string>();
   const [numeroPuntosOculto, setNumerosPuntosOcultos] = useState(0);
   const [antiguaPuntuacion, setAntiguaPuntuacion] = useState(0);
   const [userMarkers, setUserMarkers] = useState<any[]>([]);
+  const [alertVisibility, setAlertVisibility] = useState(false);
+  const [alertData,setAlertData] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -116,12 +121,37 @@ export default function Map(props: MapProps) {
           setTouchVisible(false);
         }, 2000);
         clearInterval();
+        AppState.addEventListener("change", _handleAppStateChange);
+
+      return () => {
+        AppState.removeEventListener("change", _handleAppStateChange);
+    };
       })();
     }
     return function cleanup() {
       mounted = false;
     };
-  }, []);
+  }, [appStateVisible]);
+
+  const _handleAppStateChange = async (nextAppState:any) => {
+    if (
+      appState.current.match(/active/) &&
+      nextAppState === "active"
+    ) {
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+    }else{
+      let url = "http:" + ip +":8080/salas/removeUser/" +parametros.idRuta +"&" +
+            parametros.idUsuario;
+        await axios({
+            method: "post",
+            url,
+      })
+  }
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+  };
+
 
   async function gotToCenter() {
     let location = await getCurrentPositionAsync({});
@@ -404,27 +434,65 @@ export default function Map(props: MapProps) {
     if (oculto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
-      Alert.alert(
-        "Resultado",
-        "Has encontrado un punto oculto!!!\nPuntos restantes: " +
-          visualizarOcultos
-      );
+      setAlertData({
+        titulo:"Resultado",
+        mensaje:"Has encontrado un punto oculto!!!\nPuntos restantes: " +
+        visualizarOcultos,
+        modo:"Correcto"
+      })
+      setAlertVisibility(!alertVisibility);
+      // Alert.alert(
+      //   "Resultado",
+      //   "Has encontrado un punto oculto!!!\nPuntos restantes: " +
+      //     visualizarOcultos,[
+      //       {   
+      //         text: 'Aceptar',
+      //         onPress: () => console.log('Ask me later pressed'),
+              
+      //       },
+      //     ],
+      //     { cancelable: false }
+      // );
       punto = 5 * puntos;
     } else if (acierto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
-      Alert.alert(
-        "Resultado",
-        "Has acertado!!!\nPuntos restantes: " + numeroPuntos
-      );
+      setAlertData({
+        titulo:"Resultado",
+        mensaje:"Has acertado!!!\nPuntos restantes: " + numeroPuntos,
+        modo:"Correcto"
+      })
+      setAlertVisibility(!alertVisibility);
+      // Alert.alert(
+      //   "Resultado",
+      //   "Has acertado!!!\nPuntos restantes: " + numeroPuntos
+      // );
       punto = punto + 5;
       setPuntuacion(punto);
     } else {
-      Alert.alert(
-        "Resultado",
-        "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +
-          numeroPuntos
-      );
+      setAlertData({
+        titulo:"Resultado",
+        mensaje:"Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +numeroPuntos,
+        modo:"Incorrecto"
+      })
+      setAlertVisibility(!alertVisibility);
+      // Alert.alert(
+      //   "Resultado",
+      //   "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +
+      //     numeroPuntos,[
+      //       {
+      //         text: 'Ask me later',
+      //         onPress: () => console.log('Ask me later pressed')
+      //       },
+      //       {
+      //         text: 'Cancel',
+      //         onPress: () => console.log('Cancel Pressed'),
+      //         style: 'cancel'
+      //       },
+      //       { text: 'OK', onPress: () => console.log('OK Pressed') }
+      //     ],
+      //     { cancelable: false }
+      // );
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
     }
@@ -530,6 +598,24 @@ export default function Map(props: MapProps) {
           resultado={resultado}
         ></Questions>
       </Modal>
+      
+
+      <Modal
+        style={styles.modalAlert}
+        isVisible={alertVisibility}
+        animationIn={"zoomIn"}
+        animationInTiming={1000}
+        animationOut={"fadeOut"}
+        animationOutTiming={400}
+      >
+        <Alert
+          titulo={alertData== null ? null : alertData.titulo}
+          mensaje={alertData== null ? null :alertData.mensaje}
+          modo={alertData== null ? null :alertData.modo}
+          visibility={alertVisibility}
+          setAlertVisibility={setAlertVisibility}
+        />
+      </Modal>
     </View>
   );
 }
@@ -629,19 +715,14 @@ const styles = StyleSheet.create({
     width: window.width - 60,
     height: window.height - 100,
   },
+  modalAlert:{
+    alignSelf:"center",
+    flex: 1,
+    alignItems: "center",
+    textAlign: "center",
+    margin: 22,
+    width: window.width - 60,
+    height: window.height - 500,
+    backgroundColor: "white",
+  }
 });
-// ({lat, lng}, {lat, lng}, int(metros))
-
-/** El punto está a 492 metros **/
-
-// console.log("Este está FUERA", pointIntoCircle(
-//   { lat: 42.842953, lng: -2.685813 },
-//   { lat: 42.84039768390093, lng: -2.690739957876932, },
-//   490
-// ));
-
-// console.log("Este está DENTRO", pointIntoCircle(
-//   { lat: 42.842953, lng: -2.685813 },
-//   { lat: 42.84039768390093, lng: -2.690739957876932, },
-//   495
-// ));

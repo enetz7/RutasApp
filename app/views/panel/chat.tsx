@@ -13,7 +13,6 @@ import {
   Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { set } from "react-native-reanimated";
 import { MapNavigation } from "../interface/mapNavigation";
 import useChat from "./useChat";
 
@@ -28,8 +27,6 @@ export default function Chat(props: ChatProps) {
   const handleNewMessageChange = (event: any) => {
     setNewMessage(event);
   };
-
-  const [scrollView,setScrollView] = useState<any>()
   
   const handleSendMessage = () => {
     if (newMessage !== "") {
