@@ -1,6 +1,5 @@
 export interface Ruta {
-
-  idRuta:string;
+  idRuta: string;
 
   nombre: string;
 
@@ -16,5 +15,5 @@ export interface Ruta {
 
   imagen: string;
 
-  loc:Array<Object>;
+  loc: Array<Object>;
 }

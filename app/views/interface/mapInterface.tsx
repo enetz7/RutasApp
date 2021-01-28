@@ -3,8 +3,8 @@ export interface Directions {
   longitud: number;
   nombre: string;
   oculto: number;
-  preguntas:Array<string>
-  respuestas:Array<Array<string>>
+  preguntas: Array<string>;
+  respuestas: Array<Array<string>>;
 }
 
 export interface PolyLineDirections {
@@ -12,7 +12,7 @@ export interface PolyLineDirections {
   longitude: number;
 }
 
-export interface CoordenatesObjects{
-  lat:number;
-  lng:number;
+export interface CoordenatesObjects {
+  lat: number;
+  lng: number;
 }

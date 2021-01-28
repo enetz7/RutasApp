@@ -44,23 +44,23 @@ export function Questions({
 }: QuestionsProps) {
   const renderDatos = ({ item, index }: { item: any; index: any }) => {
     return (
-      <View style={{paddingBottom:10}}>
-      <TouchableOpacity
-        style={styles.vista}
-        key={index}
-        onPress={() => {
-          setModalVisibility(!visibility);
-          if (index == 0) {
-            resultado(true, numeroModal, false, puntuacion);
-          } else {
-            resultado(false, numeroModal, false, puntuacion);
-          }
-        }}
-      >
-        <Text style={{ fontSize: 15 }} key={index}>
-          {item}
-        </Text>
-      </TouchableOpacity>
+      <View style={{ paddingBottom: 10 }}>
+        <TouchableOpacity
+          style={styles.vista}
+          key={index}
+          onPress={() => {
+            setModalVisibility(!visibility);
+            if (index == 0) {
+              resultado(true, numeroModal, false, puntuacion);
+            } else {
+              resultado(false, numeroModal, false, puntuacion);
+            }
+          }}
+        >
+          <Text style={{ fontSize: 15 }} key={index}>
+            {item}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     width: window.width - 60,
     height: window.height - 100,
     backgroundColor: "white",
-    paddingBottom:20,
+    paddingBottom: 20,
   },
   modalText: {
     flex: 1,
@@ -112,12 +112,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: window.width - 100,
     height: 100,
-    shadowColor: 'rgba(0,0,0, .4)',
+    shadowColor: "rgba(0,0,0, .4)",
     shadowOffset: { height: 1, width: 1 },
     shadowOpacity: 1,
     shadowRadius: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     elevation: 2,
-    borderRadius:20,
+    borderRadius: 20,
   },
 });

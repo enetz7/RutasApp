@@ -14,7 +14,7 @@ import {
   FlatList,
   LogBox,
   //Alert,
-  AppState
+  AppState,
 } from "react-native";
 import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
 import Location, {
@@ -84,7 +84,7 @@ export default function Map(props: MapProps) {
   const [antiguaPuntuacion, setAntiguaPuntuacion] = useState(0);
   const [userMarkers, setUserMarkers] = useState<any[]>([]);
   const [alertVisibility, setAlertVisibility] = useState(false);
-  const [alertData,setAlertData] = useState<any>(null);
+  const [alertData, setAlertData] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -123,9 +123,9 @@ export default function Map(props: MapProps) {
         clearInterval();
         AppState.addEventListener("change", _handleAppStateChange);
 
-      return () => {
-        AppState.removeEventListener("change", _handleAppStateChange);
-    };
+        return () => {
+          AppState.removeEventListener("change", _handleAppStateChange);
+        };
       })();
     }
     return function cleanup() {
@@ -133,25 +133,26 @@ export default function Map(props: MapProps) {
     };
   }, [appStateVisible]);
 
-  const _handleAppStateChange = async (nextAppState:any) => {
-    if (
-      appState.current.match(/active/) &&
-      nextAppState === "active"
-    ) {
+  const _handleAppStateChange = async (nextAppState: any) => {
+    if (appState.current.match(/active/) && nextAppState === "active") {
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
-    }else{
-      let url = "http:" + ip +":8080/salas/removeUser/" +parametros.idRuta +"&" +
-            parametros.idUsuario;
-        await axios({
-            method: "post",
-            url,
-      })
-  }
+    } else {
+      let url =
+        "http:" +
+        ip +
+        ":8080/salas/removeUser/" +
+        parametros.idRuta +
+        "&" +
+        parametros.idUsuario;
+      await axios({
+        method: "post",
+        url,
+      });
+    }
     appState.current = nextAppState;
     setAppStateVisible(appState.current);
   };
-
 
   async function gotToCenter() {
     let location = await getCurrentPositionAsync({});
@@ -201,7 +202,10 @@ export default function Map(props: MapProps) {
     }).then((response) => {
       var marcadoresUs: any[] = [];
       response.data.map((datos: any, index: any) => {
-        if(datos.latitude !=location.coords.latitude && datos.longitude != location.coords.longitude){
+        if (
+          datos.latitude != location.coords.latitude &&
+          datos.longitude != location.coords.longitude
+        ) {
           marcadoresUs.push(
             <Marker
               key={index}
@@ -216,8 +220,9 @@ export default function Map(props: MapProps) {
               />
             </Marker>
           );
-      }});
-      
+        }
+      });
+
       setUserMarkers(marcadoresUs);
     });
   }
@@ -314,7 +319,7 @@ export default function Map(props: MapProps) {
                 }, 1500);
               }}
             >
-             <Image
+              <Image
                 source={require("../../../assets/bandera.png")}
                 style={{ height: 40, width: 25 }}
               />
@@ -435,64 +440,34 @@ export default function Map(props: MapProps) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
       setAlertData({
-        titulo:"Resultado",
-        mensaje:"Has encontrado un punto oculto!!!\nPuntos restantes: " +
-        visualizarOcultos,
-        modo:"Correcto"
-      })
+        titulo: "Resultado",
+        mensaje:
+          "Has encontrado un punto oculto!!!\n\n      Puntos restantes: " +
+          visualizarOcultos,
+        modo: "Correcto",
+      });
       setAlertVisibility(!alertVisibility);
-      // Alert.alert(
-      //   "Resultado",
-      //   "Has encontrado un punto oculto!!!\nPuntos restantes: " +
-      //     visualizarOcultos,[
-      //       {   
-      //         text: 'Aceptar',
-      //         onPress: () => console.log('Ask me later pressed'),
-              
-      //       },
-      //     ],
-      //     { cancelable: false }
-      // );
       punto = 5 * puntos;
     } else if (acierto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
       setAlertData({
-        titulo:"Resultado",
-        mensaje:"Has acertado!!!\nPuntos restantes: " + numeroPuntos,
-        modo:"Correcto"
-      })
+        titulo: "Resultado",
+        mensaje: "Has acertado!!!\n\n     Puntos restantes: " + numeroPuntos,
+        modo: "Correcto",
+      });
       setAlertVisibility(!alertVisibility);
-      // Alert.alert(
-      //   "Resultado",
-      //   "Has acertado!!!\nPuntos restantes: " + numeroPuntos
-      // );
       punto = punto + 5;
       setPuntuacion(punto);
     } else {
       setAlertData({
-        titulo:"Resultado",
-        mensaje:"Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +numeroPuntos,
-        modo:"Incorrecto"
-      })
+        titulo: "Resultado",
+        mensaje:
+          "Lo siento has fallado, \nmás suerte la proxima vez\n\n     Puntos restantes: " +
+          numeroPuntos,
+        modo: "Incorrecto",
+      });
       setAlertVisibility(!alertVisibility);
-      // Alert.alert(
-      //   "Resultado",
-      //   "Lo siento has fallado, \nmás suerte la proxima vez\nPuntos restantes: " +
-      //     numeroPuntos,[
-      //       {
-      //         text: 'Ask me later',
-      //         onPress: () => console.log('Ask me later pressed')
-      //       },
-      //       {
-      //         text: 'Cancel',
-      //         onPress: () => console.log('Cancel Pressed'),
-      //         style: 'cancel'
-      //       },
-      //       { text: 'OK', onPress: () => console.log('OK Pressed') }
-      //     ],
-      //     { cancelable: false }
-      // );
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
     }
@@ -523,7 +498,7 @@ export default function Map(props: MapProps) {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ flex: 1}} pointerEvents={touchVisible ? "none" : "auto"}>
+    <View style={{ flex: 1 }} pointerEvents={touchVisible ? "none" : "auto"}>
       <MapView
         region={{
           latitude: latitude,
@@ -598,7 +573,6 @@ export default function Map(props: MapProps) {
           resultado={resultado}
         ></Questions>
       </Modal>
-      
 
       <Modal
         style={styles.modalAlert}
@@ -609,9 +583,9 @@ export default function Map(props: MapProps) {
         animationOutTiming={400}
       >
         <Alert
-          titulo={alertData== null ? null : alertData.titulo}
-          mensaje={alertData== null ? null :alertData.mensaje}
-          modo={alertData== null ? null :alertData.modo}
+          titulo={alertData == null ? null : alertData.titulo}
+          mensaje={alertData == null ? null : alertData.mensaje}
+          modo={alertData == null ? null : alertData.modo}
           visibility={alertVisibility}
           setAlertVisibility={setAlertVisibility}
         />
@@ -693,7 +667,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   modalContainer: {
-    alignSelf:"center",
+    alignSelf: "center",
     flex: 1,
     alignItems: "center",
     textAlign: "center",
@@ -715,14 +689,11 @@ const styles = StyleSheet.create({
     width: window.width - 60,
     height: window.height - 100,
   },
-  modalAlert:{
-    alignSelf:"center",
+  modalAlert: {
+    alignSelf: "center",
     flex: 1,
     alignItems: "center",
     textAlign: "center",
     margin: 22,
-    width: window.width - 60,
-    height: window.height - 500,
-    backgroundColor: "white",
-  }
+  },
 });

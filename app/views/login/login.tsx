@@ -8,17 +8,20 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Dimensions,
-  TextInput
+  TextInput,
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import Button from "../component/button";
-import DropdownAlert from 'react-native-dropdownalert';
+import DropdownAlert from "react-native-dropdownalert";
 export interface LoginProps {}
 
 export default function Login(this: any, props: LoginProps) {
-
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
   const navegacion = useNavigation();
@@ -27,7 +30,11 @@ export default function Login(this: any, props: LoginProps) {
   const onFinish = () => {
     var urlNick = "http://" + ip + ":8080/usuario/" + nombre;
     if (nombre == "") {
-      dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
+      dropDownAlertRef.current.alertWithType(
+        "error",
+        "Error",
+        "Los datos introducidos no son correctos"
+      );
     } else {
       axios
         .get(urlNick)
@@ -36,15 +43,29 @@ export default function Login(this: any, props: LoginProps) {
         })
         .then((usuarios) => {
           if (usuarios == null) {
-            dropDownAlertRef.current.alertWithType('error', 'Error', 'El usuario introducido no existe');
+            dropDownAlertRef.current.alertWithType(
+              "error",
+              "Error",
+              "El usuario introducido no existe"
+            );
           } else {
             if (password === usuarios["contrasena"]) {
-              dropDownAlertRef.current.alertWithType('success', 'Correcto', 'Login existoso');
-              setTimeout(()=>{navegacion.navigate("filter", {
-                usuario:usuarios
-              })},1000)
+              dropDownAlertRef.current.alertWithType(
+                "success",
+                "Correcto",
+                "Login existoso"
+              );
+              setTimeout(() => {
+                navegacion.navigate("filter", {
+                  usuario: usuarios,
+                });
+              }, 1000);
             } else {
-              dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
+              dropDownAlertRef.current.alertWithType(
+                "error",
+                "Error",
+                "Los datos introducidos no son correctos"
+              );
             }
           }
         });
@@ -56,9 +77,9 @@ export default function Login(this: any, props: LoginProps) {
   };
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1}}>
-       <View style={{flex:1}}>
-        <DropdownAlert ref={ref => dropDownAlertRef.current=ref} />
+    <KeyboardAwareScrollView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <DropdownAlert ref={(ref) => (dropDownAlertRef.current = ref)} />
       </View>
       <View style={styles.container}>
         <View style={styles.login}>
@@ -114,7 +135,7 @@ export default function Login(this: any, props: LoginProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop:100,
+    paddingTop: 100,
   },
   login: {
     flex: 1,

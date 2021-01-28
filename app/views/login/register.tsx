@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Dimensions,
-  TextInput
+  TextInput,
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import Button from "../component/button";
-import DropdownAlert from 'react-native-dropdownalert';
+import DropdownAlert from "react-native-dropdownalert";
 export interface RegisterProps {}
 
 export default function Register(props: RegisterProps) {
@@ -25,7 +25,11 @@ export default function Register(props: RegisterProps) {
 
   const Registrarse = () => {
     if (nombre == "") {
-      dropDownAlertRef.current.alertWithType('error', 'Error', 'Los datos introducidos no son correctos');
+      dropDownAlertRef.current.alertWithType(
+        "error",
+        "Error",
+        "Los datos introducidos no son correctos"
+      );
     } else {
       axios({
         method: "post",
@@ -37,16 +41,22 @@ export default function Register(props: RegisterProps) {
           admin: false,
         },
       }).then(() => {
-        dropDownAlertRef.current.alertWithType('success', 'Correcto', 'Se ha registrado correctamente');
-        setTimeout(()=>{navegacion.navigate("login", {})},1000);
+        dropDownAlertRef.current.alertWithType(
+          "success",
+          "Correcto",
+          "Se ha registrado correctamente"
+        );
+        setTimeout(() => {
+          navegacion.navigate("login", {});
+        }, 1000);
       });
     }
-  }
+  };
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1}}>
-      <View style={{flex:1}}>
-        <DropdownAlert ref={ref => dropDownAlertRef.current=ref} />
+    <KeyboardAwareScrollView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <DropdownAlert ref={(ref) => (dropDownAlertRef.current = ref)} />
       </View>
       <View style={styles.container}>
         <View style={styles.login}>
@@ -102,7 +112,7 @@ export default function Register(props: RegisterProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop:100,
+    paddingTop: 100,
   },
   login: {
     flex: 1,

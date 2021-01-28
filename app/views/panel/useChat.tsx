@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { ip } from "../../config/credenciales";
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
 //const SOCKET_SERVER_URL = "http://10.10.12.119:4000";
-const SOCKET_SERVER_URL = "http://"+ip+":4000";
+const SOCKET_SERVER_URL = "http://" + ip + ":4000";
 
 const useChat = (roomId: string) => {
   const [messages, setMessages] = useState<any[]>([]);

@@ -5,11 +5,11 @@ export interface MapNavigation {
 }
 
 interface params {
-  nombreRuta:string;
+  nombreRuta: string;
   latitude: string;
   longitude: string;
-  loc:Array<Object>;
-  vehiculo:string;
-  idRuta:string;
-  idUsuario:string;
+  loc: Array<Object>;
+  vehiculo: string;
+  idRuta: string;
+  idUsuario: string;
 }
