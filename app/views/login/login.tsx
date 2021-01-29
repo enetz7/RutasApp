@@ -55,7 +55,7 @@ export default function Login(this: any, props: LoginProps) {
               dropDownAlertRef.current.alertWithType(
                 "success",
                 "Correcto",
-                "Login existoso"
+                "Login exitoso"
               );
               //Navegacion hacia la siguiente pestaña
               setTimeout(() => {
