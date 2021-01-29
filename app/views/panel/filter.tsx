@@ -5,14 +5,12 @@ import {
   Text,
   View,
   TouchableOpacity,
-  //Button,
   ImageBackground,
 } from "react-native";
 
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
-  NavigationContainer,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
@@ -23,6 +21,7 @@ import Button from "../component/button";
 
 export interface FilterProps {}
 
+//Funcion para hacer el filtro de busqueda de las rutas
 export default function Filter(props: FilterProps) {
   const [valueCiudades, setValueCiudades] = useState(null);
   const [valueVehiculo, setValueVehiculo] = useState(null);
@@ -39,6 +38,7 @@ export default function Filter(props: FilterProps) {
   useEffect(() => {
     var ciudad = [] as any;
     var coordenada = [] as any;
+    //Peticion a la api para recoger todas las ciudades que haya
     var urlCiudades = "http://" + ip + ":8080/ciudades/all";
     axios
       .get(urlCiudades)
@@ -46,6 +46,7 @@ export default function Filter(props: FilterProps) {
         return response.data;
       })
       .then((ciudades) => {
+        //Guardar cada informacion que me interese de las ciudades en un array
         ciudades.map((numero: any) => {
           coordenada.push({
             ciudad: numero["nombre"],
@@ -59,11 +60,13 @@ export default function Filter(props: FilterProps) {
       });
   }, []);
 
+  //Funcion para crear una carta con la imagen de la ruta y su informacion dependiendo los valores que has escogido en la busqueda
   function printList() {
     return arrayRuta.map((item, index) => (
       <View key={index} style={styles.viewImage}>
         <TouchableOpacity
           onPress={() => {
+            //Pasarle a la navegacion los datos que quiero que tenga la ventana a la que voy a acceder, el mapa
             navegacion.navigate("map", {
               vehiculo: item.vehiculo,
               nombreRuta: item.nombre,
@@ -104,6 +107,7 @@ export default function Filter(props: FilterProps) {
     ));
   }
 
+  //Funcion para buscar rutas dependiendo los datos que has seleccionado
   const buscar = () => {
     var urlCiudadVehiculo =
       "http://" +
@@ -121,10 +125,11 @@ export default function Filter(props: FilterProps) {
       })
       .then((rutas) => {
         var ruta: Ruta[] = [];
+        //Guardar los valores que me interesan de la ruta dentro de un array
         rutas.map((numero: any) => {
           var img = "";
           if (numero.imagen == null) {
-            img = "../../../assets/easter.png";
+            img = "../../../assets/acierto.png";
           } else {
             img = numero.imagen.thumbUrl;
           }
@@ -144,6 +149,7 @@ export default function Filter(props: FilterProps) {
       });
   };
 
+  //Vista del filtro
   return (
     <KeyboardAwareScrollView style={{ flex: 1, paddingTop: 50 }}>
       <View style={styles.container}>
@@ -213,6 +219,7 @@ export default function Filter(props: FilterProps) {
   );
 }
 
+//Estilos de la vista del filtro
 const styles = StyleSheet.create({
   container: {
     flex: 1,

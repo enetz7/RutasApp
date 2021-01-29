@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
   Dimensions,
 } from "react-native";
 
+//Constantes de funcionalidades externas
 const { width, height } = Dimensions.get("window");
 type setAlertVisibility = (visibility: boolean) => void;
 
+//Interfaz de los datos que recibe para poder crear este componente
 export interface AlertProps {
   titulo: string;
   mensaje: string;
@@ -19,6 +21,7 @@ export interface AlertProps {
   setAlertVisibility: setAlertVisibility;
 }
 
+//Funcion donde crea una vista de alerta para las respuestas con los datos recibidos
 export function Alert({
   titulo,
   mensaje,
@@ -26,14 +29,17 @@ export function Alert({
   visibility,
   setAlertVisibility,
 }: AlertProps) {
+  //Si los datos recibidos son nulos, se devuelve un null
   if (titulo == null || mensaje == null || modo == null) {
     return null;
   }
 
+  //Funcion para cambiar la visibilidad de la alerta
   function onPres() {
     setAlertVisibility(!visibility);
   }
 
+  //Vista de la alerta
   return (
     <View style={styles.container}>
       <View
@@ -90,6 +96,7 @@ export function Alert({
   );
 }
 
+//Estilos de la vista alerta
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",

@@ -1,3 +1,4 @@
+//Interfaz de los datos que tienes un usuario
 export interface Usuario {
   nombre: string;
 

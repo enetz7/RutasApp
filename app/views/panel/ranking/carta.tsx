@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import { Row } from "react-bootstrap";
-import { View, Text, StyleSheet, Image, ViewStyle } from "react-native";
+import React from "react";
+import {Text, StyleSheet, Image} from "react-native";
 import { Usuario } from "../../interface/usuario";
 import { LinearGradient } from "expo-linear-gradient";
+//Interfaz de los datos que recibe para poder crear este componente
 export interface CartaProps {
   usuario: Usuario;
   indice: number;
   puntuacion: number;
   ruta: string;
 }
-
+//Funcion para crear el ranking con sus cartas depediendo la posicion
 export function Carta(props: CartaProps) {
   const image = "./avatares/avatarPorDefecto.jpg";
   let RankingStyle;
   let gradientColor = [];
+  //Cambiar los estilos en funcion a tu posicion en el ranking
   if (props.indice == 0) {
     RankingStyle = styles.vistaPrimero;
     gradientColor = ["#fceabb", "#f8b500"];
@@ -27,6 +28,7 @@ export function Carta(props: CartaProps) {
     RankingStyle = styles.vista;
     gradientColor = ["white", "white"];
   }
+  //Vista de cada carta del ranking
   return (
     <LinearGradient
       start={{ x: 0, y: 1 }}
@@ -44,6 +46,8 @@ export function Carta(props: CartaProps) {
     </LinearGradient>
   );
 }
+
+//Estilos de la carta del ranking
 const styles = StyleSheet.create({
   texto: {
     fontSize: 15,

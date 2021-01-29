@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ip } from "../../config/credenciales";
-import { StyleSheet, View } from "react-native";
+import {View } from "react-native";
 
 import axios from "axios";
 import { FlatList } from "react-native-gesture-handler";
@@ -10,10 +10,13 @@ import { MapNavigation } from "../interface/mapNavigation";
 
 export interface RankingProps {}
 
+//Funcion para crear el ranking
 export default function Ranking(props: RankingProps) {
   const [puntuaciones, setPuntuaciones] = useState([]);
+  //Constante donde se recogen los parametros recibidos desde el navigator
   const parametros = useRoute<MapNavigation>().params;
   function ranking() {
+    //Vista del ranking
     return (
       <View>
         <FlatList
@@ -25,6 +28,7 @@ export default function Ranking(props: RankingProps) {
     );
   }
 
+  //Funcion para crear una carta personalizada con los datos que le paso
   const renderCarta = ({ item, index }: { item: any; index: any }) => {
     return (
       <Carta
@@ -47,6 +51,7 @@ export default function Ranking(props: RankingProps) {
         return response.data;
       })
       .then((puntuacion) => {
+        //Guardar la informacion que me intersa enseñar en la carta
         puntuacion.map((numero: any) => {
           puntos.push({
             usuario: numero["usuario"],
@@ -60,13 +65,3 @@ export default function Ranking(props: RankingProps) {
 
   return <View>{ranking()}</View>;
 }
-
-const styles = StyleSheet.create({
-  texto: {
-    fontSize: 15,
-    alignSelf: "center",
-    padding: 10,
-    paddingHorizontal: 20,
-    textAlign: "center",
-  },
-});

@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  Button,
-  TouchableHighlight,
   Dimensions,
-  TouchableWithoutFeedback,
   FlatList,
 } from "react-native";
-import Modal from "react-native-modal";
 
+//Constantes de funcionalidades externas
 const window = Dimensions.get("window");
-const screen = Dimensions.get("screen");
 type setModalVisibility = (visibility: boolean) => void;
 type resultado = (
   acierto: boolean,
@@ -23,6 +17,7 @@ type resultado = (
   oculto: boolean,
   puntos: number
 ) => void;
+//Interfaz de los datos que recibe para poder crear este componente
 export interface QuestionsProps {
   numeroModal: number;
   preguntas: Array<string> | null;
@@ -33,6 +28,7 @@ export interface QuestionsProps {
   puntuacion: number;
 }
 
+//Funcion para crear los pop up de las preguntas con sus respuestas
 export function Questions({
   numeroModal,
   preguntas,
@@ -42,6 +38,7 @@ export function Questions({
   resultado,
   puntuacion,
 }: QuestionsProps) {
+  //Funcion para crear cada respuesta con un estilo en especifico
   const renderDatos = ({ item, index }: { item: any; index: any }) => {
     return (
       <View style={{ paddingBottom: 10 }}>
@@ -67,7 +64,9 @@ export function Questions({
   if (preguntas == null || respuestas == null) {
     return null;
   }
+  //Random para coger una pregunta al azar
   const random = Math.floor(Math.random() * preguntas.length);
+  //Vista de las pregunta con sus respuestas
   return (
     <View style={styles.modalContainer}>
       <Text style={{ fontSize: 20, fontWeight: "bold" }}>
@@ -83,6 +82,7 @@ export function Questions({
   );
 }
 
+//Estilos de la vista de la pregunta con sus respuestas
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

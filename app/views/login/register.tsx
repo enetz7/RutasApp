@@ -4,33 +4,33 @@ import {
   StyleSheet,
   Text,
   View,
-  Linking,
-  TouchableOpacity,
-  ToastAndroid,
-  Dimensions,
   TextInput,
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import Button from "../component/button";
 import DropdownAlert from "react-native-dropdownalert";
 export interface RegisterProps {}
 
+//Funcion para el registro
 export default function Register(props: RegisterProps) {
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
   const navegacion = useNavigation();
   const dropDownAlertRef = useRef<any>();
 
+  //Funcion para registrar el usuario nuevo
   const Registrarse = () => {
     if (nombre == "") {
+      //Alerta de error de que no son correctos los datos introducidos
       dropDownAlertRef.current.alertWithType(
         "error",
         "Error",
         "Los datos introducidos no son correctos"
       );
     } else {
+      //Peticion a la base de datos donde le enviamos la informacion del nuevo usuario
       axios({
         method: "post",
         url: "http://" + ip + ":8080/usuario/newUsuario",
@@ -41,18 +41,20 @@ export default function Register(props: RegisterProps) {
           admin: false,
         },
       }).then(() => {
+        //Alerta de que se ha registrado correctamente
         dropDownAlertRef.current.alertWithType(
           "success",
           "Correcto",
           "Se ha registrado correctamente"
         );
+        //Navegacion hacia el login despues de registrarte
         setTimeout(() => {
           navegacion.navigate("login", {});
         }, 1000);
       });
     }
   };
-
+  //Vista del registro
   return (
     <KeyboardAwareScrollView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -109,6 +111,7 @@ export default function Register(props: RegisterProps) {
   );
 }
 
+//Estilos de la vista de registro
 const styles = StyleSheet.create({
   container: {
     flex: 1,

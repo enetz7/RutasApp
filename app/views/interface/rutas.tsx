@@ -1,3 +1,4 @@
+//Interfaz de los datos que tiene un objeto ruta
 export interface Ruta {
   idRuta: string;
 

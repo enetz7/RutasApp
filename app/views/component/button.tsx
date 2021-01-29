@@ -8,6 +8,7 @@ export interface ButtonProps {
   width: number;
 }
 
+//Boton personalizado para todos los botones de la aplicacion
 const Button = ({ label, width, onPress }: ButtonProps) => {
   return (
     <RectButton

@@ -1,23 +1,17 @@
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute} from "@react-navigation/native";
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Button,
-  TouchableHighlight,
   Dimensions,
-  TouchableWithoutFeedback,
-  FlatList,
   LogBox,
-  //Alert,
   AppState,
 } from "react-native";
-import MapView, { LatLng, Marker, Polyline } from "react-native-maps";
-import Location, {
+import MapView, {Marker, Polyline } from "react-native-maps";
+import {
   LocationObject,
   requestPermissionsAsync,
   getCurrentPositionAsync,
@@ -27,8 +21,6 @@ import { MapNavigation } from "../interface/mapNavigation";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import {
   Directions,
-  PolyLineDirections,
-  CoordenatesObjects,
 } from "../interface/mapInterface";
 import Modal from "react-native-modal";
 import { Questions } from "./map/questions";
@@ -36,11 +28,15 @@ import { ip } from "../../config/credenciales";
 import { getPreciseDistance } from "geolib";
 import { Alert } from "./map/alert";
 
+
+//Constantes de funcionalidades externas
 const window = Dimensions.get("window");
 
 export interface MapProps {}
 
+//Funcion donde muestro del mapa con las rutas y puntos
 export default function Map(props: MapProps) {
+  //Interfaz local para establecer una geolocalizacion por defecto en caso de no permitir el acceso a la geolocalizacion
   const local: LocationObject = {
     coords: {
       latitude: 43.3415452,
@@ -60,9 +56,12 @@ export default function Map(props: MapProps) {
   var antiguaPuntuacionOculta = 0;
   var visualizarOcultos = 0;
   var idPartidaOculto = 0;
+  //Constante donde se recogen los parametros recibidos desde el navigator
   const parametros = useRoute<MapNavigation>().params;
+  //Constante para guardar la geolocalizacion del usuario
   const [location, setLocation] = useState<LocationObject>(local);
   const [errorMsg, setErrorMsg] = useState(String);
+  //Capa de vision del mapa
   const [latitudeDelta, setLatitudeDelta] = useState(41.3415452);
   const [longitudeDelta, setLongitudeDelta] = useState(-0.0145859);
   const [latitude, setLatitude] = useState(40);
@@ -87,6 +86,7 @@ export default function Map(props: MapProps) {
   const [alertData, setAlertData] = useState<any>(null);
 
   useEffect(() => {
+    //Si esta montando ya el componente para que no se sobreescriba y la renderizacion de nuevo
     let mounted = true;
     if (mounted) {
       (async () => {
@@ -96,17 +96,22 @@ export default function Map(props: MapProps) {
           return;
         }
         setLoading(false);
+        //Coger la geolocalizacion cada 10 segundos para poder ir actualizando la localizacion
         let location = await getCurrentPositionAsync({});
         setLocation(location);
         setInterval(async () => {
           setLocation(await getCurrentPositionAsync({}));
         }, 10000);
+        //Mirar si ya has jugado alguna vez en esta ruta
         const existe = await buscarPartida();
+        //Si es tu primera vez en la ruta te creea una instancia nueva
         if (!existe) {
           await iniciarRuta();
         }
+        //Poner las rutas en el mapa y los puntos
         await rutes();
         await markers();
+        //Poner los usuarios que se encuentre tambien esta ruta, a la vez que introduces tu localizacion en la base de datos para los demas usuarios
         setInterval(async () => {
           await marcarUsuarios();
         }, 20000);
@@ -116,11 +121,14 @@ export default function Map(props: MapProps) {
           latitudeDelta: 0.015,
           longitudeDelta: 0.026,
         };
+        //Animacion que te va acercando hacia tu mapa
         await mapref.current.animateToRegion(ciudad, 1200);
+        //Intervalo que no te deja mover el mapa hasta que se acabe la animacion
         setInterval(() => {
           setTouchVisible(false);
         }, 2000);
         clearInterval();
+        //Funcion para ver el estado de la aplicacion.
         AppState.addEventListener("change", _handleAppStateChange);
 
         return () => {
@@ -133,11 +141,14 @@ export default function Map(props: MapProps) {
     };
   }, [appStateVisible]);
 
+  //Funcion par comprobar el estado de la aplicacion
   const _handleAppStateChange = async (nextAppState: any) => {
+    //Si esta activo la aplicacion establece el estado como activo en caso de que antes no lo estuviera
     if (appState.current.match(/active/) && nextAppState === "active") {
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
     } else {
+    //Si pasa a no estar activo te borra de la base de datos para que no aparezcas en el mapa hasta que vuelvas a la aplicacion
       let url =
         "http:" +
         ip +
@@ -154,6 +165,7 @@ export default function Map(props: MapProps) {
     setAppStateVisible(appState.current);
   };
 
+  //Funcion que te lleva a tu posicion actual
   async function gotToCenter() {
     let location = await getCurrentPositionAsync({});
 
@@ -166,6 +178,7 @@ export default function Map(props: MapProps) {
     await mapref.current.animateToRegion(region3, 2000);
   }
 
+  //Funcion que añade zoom al mapa
   function addZoom() {
     setZoom(true);
     if (latitudeDelta < 0.005) {
@@ -177,12 +190,14 @@ export default function Map(props: MapProps) {
     }
   }
 
+  //Funcion que quita zoom en el mapa
   function removeZoom() {
     setZoom(true);
     setLatitudeDelta(latitudeDelta * 1.2);
     setLongitudeDelta(longitudeDelta * 1.2);
   }
 
+  //Funcion para crear un marcador por cada usuario en esa ruta actualmente
   async function marcarUsuarios() {
     let location = await getCurrentPositionAsync({});
     let url =
@@ -201,6 +216,7 @@ export default function Map(props: MapProps) {
       url,
     }).then((response) => {
       var marcadoresUs: any[] = [];
+      //Se guardan los marcadores con los valores de latitud y longitud de donde se encuentre el usuario
       response.data.map((datos: any, index: any) => {
         if (
           datos.latitude != location.coords.latitude &&
@@ -227,12 +243,14 @@ export default function Map(props: MapProps) {
     });
   }
 
+  //Funcion para crear un marcador con las localizaciones en donde hay preguntas
   async function markers() {
     var marcadores: any[] = [];
     var visualizaciones: any[] = [];
     var visualizarPo: any[] = [];
     var suma = 0;
     var marcas = parametros.loc as Directions[];
+    //Se guardan los marcadores con sus respectivos datos dependiendo de si son ocultos o no
     marcas.map((parametro, index) => {
       if (parametro.oculto != 2) {
         suma = suma + 1;
@@ -253,6 +271,7 @@ export default function Map(props: MapProps) {
                 var interval = setInterval(async () => {
                   var locaT = await getCurrentPositionAsync({});
                   if (
+                    //Funcion para mirar la distancia entre 2 puntos
                     getPreciseDistance(
                       {
                         latitude: locaT.coords.latitude,
@@ -297,6 +316,7 @@ export default function Map(props: MapProps) {
                 var intervalo = setInterval(async () => {
                   var locaT = await getCurrentPositionAsync({});
                   if (
+                    //Funcion para mirar la distancia entre 2 puntos
                     getPreciseDistance(
                       {
                         latitude: locaT.coords.latitude,
@@ -335,8 +355,10 @@ export default function Map(props: MapProps) {
     await setMarker(marcadores);
   }
 
+  //Funcion para crear la ruta
   async function rutes() {
     var modo = "";
+    //Comprobacion para ver de que manera se quiere realizar la ruta
     if (parametros.vehiculo == "Bicicleta") {
       modo = "cycling-regular";
     } else if (parametros.vehiculo == "Andando") {
@@ -346,7 +368,9 @@ export default function Map(props: MapProps) {
     }
     var coordenadas: any[] = [];
     var localizaciones = parametros.loc as Directions[];
+    //Se realizan peticiones entre 2 puntos para que devuelva un camino con sus coordendas
     for (var i = 0; i < localizaciones.length - 1; i++) {
+      //Peticion a la api con punto de inicio y punto de fin
       const url =
         "https://api.openrouteservice.org/v2/directions/" +
         modo +
@@ -362,6 +386,7 @@ export default function Map(props: MapProps) {
         method: "get",
         url,
       }).then((response) => {
+        //Se crear un camino con las coordendas recogidas de la api
         coordenadas.push(
           <Polyline
             key={i}
@@ -387,6 +412,7 @@ export default function Map(props: MapProps) {
     }
   }
 
+  //Funcion para buscar si existe una partida
   async function buscarPartida() {
     LogBox.ignoreAllLogs();
     const datos = await axios({
@@ -411,6 +437,7 @@ export default function Map(props: MapProps) {
     return datos;
   }
 
+  //Funcion para crear una partida en caso de que no hubiera una partida creada
   async function iniciarRuta() {
     await axios({
       method: "post",
@@ -428,6 +455,7 @@ export default function Map(props: MapProps) {
     });
   }
 
+  //Funcion para ir sumando la puntuacion y restando localizaciones, al acabar se inserta la puntuacion final a la base de datos
   async function resultado(
     acierto: boolean,
     numero: number,
@@ -436,9 +464,11 @@ export default function Map(props: MapProps) {
   ) {
     var visuModal = visualizarModals;
     var punto = puntos;
+    //En caso de que el punto encontrado sea oculto
     if (oculto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
+      //Alerta de encontrar punto oculto
       setAlertData({
         titulo: "Resultado",
         mensaje:
@@ -448,9 +478,11 @@ export default function Map(props: MapProps) {
       });
       setAlertVisibility(!alertVisibility);
       punto = 5 * puntos;
+    //En caso de que has dado la respuesta correcta 
     } else if (acierto) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
+      //Alerta de resultado correcto
       setAlertData({
         titulo: "Resultado",
         mensaje: "Has acertado!!!\n\n     Puntos restantes: " + numeroPuntos,
@@ -459,7 +491,9 @@ export default function Map(props: MapProps) {
       setAlertVisibility(!alertVisibility);
       punto = punto + 5;
       setPuntuacion(punto);
+    //En caso de que has dado la respuesta incorrecta
     } else {
+      //Alerta de respuesta incorrecta
       setAlertData({
         titulo: "Resultado",
         mensaje:
@@ -471,6 +505,7 @@ export default function Map(props: MapProps) {
       visuModal[numero] = false;
       setVisualizarModals(visuModal);
     }
+    //En caso de que ya no quede ningun punto se inserta la puntuacion a la base de datos
     if (numeroPuntos == 0 && visualizarOcultos == 0) {
       punto = punto + 5 * numeroPuntosOculto;
       var value;
@@ -497,6 +532,8 @@ export default function Map(props: MapProps) {
   if (loading) {
     return <ActivityIndicator />;
   }
+
+  //Vista del mapa
   return (
     <View style={{ flex: 1 }} pointerEvents={touchVisible ? "none" : "auto"}>
       <MapView
@@ -509,6 +546,7 @@ export default function Map(props: MapProps) {
         ref={mapref}
         moveOnMarkerPress={false}
         style={{ width: 600, height: 800 }}
+        //Para que se vaya cambiando el mapa en funcion al movimiento que hagas
         onRegionChangeComplete={(zona) => {
           if (!zoom) {
             setLatitude(zona.latitude);
@@ -535,6 +573,7 @@ export default function Map(props: MapProps) {
         {polyLine}
         {marker}
       </MapView>
+      {/* Boton que te lleva a tu posicion */}
       <TouchableOpacity
         onPress={() => {
           gotToCenter();
@@ -544,15 +583,19 @@ export default function Map(props: MapProps) {
         <MaterialIcons name="my-location" size={28} color="black" />
       </TouchableOpacity>
 
+        {/* Boton que añade zoom al mapa */}
       <TouchableOpacity onPress={() => addZoom()} style={styles.zoomButtonAdd}>
         <Ionicons name="add" size={23} color="black" />
       </TouchableOpacity>
+      {/* Boton que quita zoom al mapa */}
       <TouchableOpacity
         onPress={() => removeZoom()}
         style={styles.zoomButtonRemove}
       >
         <Ionicons name="remove" size={23} color="black" />
       </TouchableOpacity>
+
+      {/* Modal donde aparece la pregunta y respuesta en funcion el punto que encuentres */}
       <Modal
         style={styles.modalContainer}
         isVisible={visibility}
@@ -563,6 +606,7 @@ export default function Map(props: MapProps) {
         animationOut={"fadeOut"}
         animationOutTiming={400}
       >
+        {/* Componente personalizado para establecer las preguntas y respuestas */}
         <Questions
           puntuacion={puntuacion}
           numeroModal={numeroModal}
@@ -573,7 +617,7 @@ export default function Map(props: MapProps) {
           resultado={resultado}
         ></Questions>
       </Modal>
-
+        {/* Modal para mostrar la alerta despues de seleccionar una respuesta */}
       <Modal
         style={styles.modalAlert}
         isVisible={alertVisibility}
@@ -582,6 +626,7 @@ export default function Map(props: MapProps) {
         animationOut={"fadeOut"}
         animationOutTiming={400}
       >
+        {/* Componente personalizado para darle un estilo a la alerta de la respuesta */}
         <Alert
           titulo={alertData == null ? null : alertData.titulo}
           mensaje={alertData == null ? null : alertData.mensaje}
@@ -594,6 +639,7 @@ export default function Map(props: MapProps) {
   );
 }
 
+//Estilos del mapa
 const styles = StyleSheet.create({
   centerButtonContainer: {
     width: 60,

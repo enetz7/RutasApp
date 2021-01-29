@@ -1,6 +1,5 @@
 import { useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
-
 import {
   View,
   Text,
@@ -16,18 +15,25 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { MapNavigation } from "../interface/mapNavigation";
 import useChat from "./useChat";
 
+//Constante de funcionalidades externas
 const window = Dimensions.get("window");
 export interface ChatProps {}
 
+//Funcion para poder visualizar el chat
 export default function Chat(props: ChatProps) {
+  //Constante donde se recogen los parametros recibidos desde el navigator
   const parametros = useRoute<MapNavigation>().params;
+  //Id de la sala dependiendo la ruta en la que estes
   const { roomId } = { roomId: parametros.nombreRuta };
+  //Comprobacion de los mensajes en la sala en la que estes
   const { messages, sendMessage } = useChat(roomId);
   const [newMessage, setNewMessage] = useState("");
+
+  //Funcion para que se vaya cambiando el texto del input
   const handleNewMessageChange = (event: any) => {
     setNewMessage(event);
   };
-
+  //Funcion para enviar mensajes al chat
   const handleSendMessage = () => {
     if (newMessage !== "") {
       sendMessage(newMessage);
@@ -36,11 +42,13 @@ export default function Chat(props: ChatProps) {
   };
   React.useEffect(() => {}, [messages]);
 
+  //Vista del chat
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <FlatList
         data={messages}
         renderItem={({ item, index }) =>
+        //Mirar si es del propio usuario el mensaje para cambiar los estilos dependiendo quien lo envie
           item.ownedByCurrentUser ? (
             <Text key={index} style={styles.myText}>
               {item.body}
@@ -76,6 +84,7 @@ export default function Chat(props: ChatProps) {
   );
 }
 
+//Estilos del chat
 const styles = StyleSheet.create({
   container: {
     flex: 1,

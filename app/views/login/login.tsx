@@ -1,35 +1,36 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { ip } from "../../config/credenciales";
 import {
   StyleSheet,
   Text,
   View,
-  Linking,
-  TouchableOpacity,
-  ToastAndroid,
-  Dimensions,
   TextInput,
 } from "react-native";
 import axios from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
-  NavigationContainer,
   useNavigation,
-  useRoute,
 } from "@react-navigation/native";
 import Button from "../component/button";
 import DropdownAlert from "react-native-dropdownalert";
 export interface LoginProps {}
 
+
+//Funcion para loguear en la aplicacion
 export default function Login(this: any, props: LoginProps) {
+
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
   const navegacion = useNavigation();
   const dropDownAlertRef = useRef<any>();
 
+
+  //Funcion donde se comprueba que los datos establecidos son correctos para poder loguear
   const onFinish = () => {
+    //Peticion de busqueda a la api
     var urlNick = "http://" + ip + ":8080/usuario/" + nombre;
     if (nombre == "") {
+      //Alerta de que no son correctos los datos introducidos
       dropDownAlertRef.current.alertWithType(
         "error",
         "Error",
@@ -43,6 +44,7 @@ export default function Login(this: any, props: LoginProps) {
         })
         .then((usuarios) => {
           if (usuarios == null) {
+            //Alerta de que no son existe el usuario
             dropDownAlertRef.current.alertWithType(
               "error",
               "Error",
@@ -55,12 +57,14 @@ export default function Login(this: any, props: LoginProps) {
                 "Correcto",
                 "Login existoso"
               );
+              //Navegacion hacia la siguiente pestaña
               setTimeout(() => {
                 navegacion.navigate("filter", {
                   usuario: usuarios,
                 });
               }, 1000);
             } else {
+              //Alerta de que los datos introducidos no son correctos
               dropDownAlertRef.current.alertWithType(
                 "error",
                 "Error",
@@ -72,10 +76,12 @@ export default function Login(this: any, props: LoginProps) {
     }
   };
 
+  //Funcion para navegar a la ventana de registro
   const Registrarse = () => {
     navegacion.navigate("register", {});
   };
 
+  //Vista del login
   return (
     <KeyboardAwareScrollView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -132,6 +138,8 @@ export default function Login(this: any, props: LoginProps) {
   );
 }
 
+
+//Estilos de la vista del login
 const styles = StyleSheet.create({
   container: {
     flex: 1,
